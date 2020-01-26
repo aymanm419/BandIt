@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">BandIt</string>
+    <string name="song_name">Song Name</string>
+    <string name="album_name">Album Name</string>
 </resources>
