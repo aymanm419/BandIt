@@ -8,12 +8,11 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import lombok.AccessLevel;
 import lombok.Getter;
 import my.bandit.R;
 
 public class PostViewHolder extends RecyclerView.ViewHolder {
-    @Getter(AccessLevel.PUBLIC)
+    @Getter
     private TextView SongTextView, AlbumTextView;
     @Getter
     private ImageView LikeImageView, UnlikeImageView, HeartImageView;
