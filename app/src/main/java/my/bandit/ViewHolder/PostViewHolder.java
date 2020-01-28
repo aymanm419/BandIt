@@ -13,19 +13,20 @@ import my.bandit.R;
 
 public class PostViewHolder extends RecyclerView.ViewHolder {
     @Getter
-    private TextView SongTextView, AlbumTextView;
+    private TextView postTextView, postAlbumTextView;
     @Getter
-    private ImageView LikeImageView, UnlikeImageView, HeartImageView;
+    private ImageView LikeImageView, UnlikeImageView, HeartImageView, albumPicture;
     @Getter
     private ProgressBar SongProgressBar;
 
     public PostViewHolder(@NonNull View itemView) {
         super(itemView);
-        SongTextView = itemView.findViewById(R.id.PostSongName);
-        AlbumTextView = itemView.findViewById(R.id.PostSingAlbum);
+        postTextView = itemView.findViewById(R.id.PostSongName);
+        postAlbumTextView = itemView.findViewById(R.id.PostSingAlbum);
         LikeImageView = itemView.findViewById(R.id.PostLikeImage);
         UnlikeImageView = itemView.findViewById(R.id.PostUnlikeImage);
         HeartImageView = itemView.findViewById(R.id.PostHeartImage);
         SongProgressBar = itemView.findViewById(R.id.PostProgressBar);
+        albumPicture = itemView.findViewById(R.id.albumPicture);
     }
 }

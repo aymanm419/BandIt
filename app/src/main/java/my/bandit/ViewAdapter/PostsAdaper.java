@@ -1,25 +1,30 @@
 package my.bandit.ViewAdapter;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Setter;
+import my.bandit.Model.Post;
 import my.bandit.R;
-import my.bandit.Song;
 import my.bandit.ViewHolder.PostViewHolder;
 
 public class PostsAdaper extends RecyclerView.Adapter<PostViewHolder> {
     @Setter
-    List<Song> Songs;
+    List<Post> posts;
+    Context mContext;
 
-    public PostsAdaper(ArrayList<Song> Posts) {
-        Songs = Posts;
+    public PostsAdaper(Context mContext, ArrayList<Post> Posts) {
+        this.mContext = mContext;
+        posts = Posts;
     }
 
     @NonNull
@@ -30,12 +35,13 @@ public class PostsAdaper extends RecyclerView.Adapter<PostViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull PostViewHolder holder, int position) {
-        holder.getSongTextView().setText(Songs.get(position).getSongName());
-        holder.getAlbumTextView().setText(Songs.get(position).getAlbumName());
+        holder.getPostTextView().setText(posts.get(position).getSong().getSongName());
+        holder.getPostAlbumTextView().setText(posts.get(position).getSong().getAlbumName());
+        Glide.with(mContext).load(posts.get(position).getPicture()).into(holder.getAlbumPicture());
     }
 
     @Override
     public int getItemCount() {
-        return Songs.size();
+        return posts.size();
     }
 }

@@ -9,15 +9,14 @@ import androidx.lifecycle.MutableLiveData;
 import java.util.ArrayList;
 
 import lombok.Getter;
-import my.bandit.Song;
+import my.bandit.Model.Post;
 
 public class PostsViewModel extends AndroidViewModel {
     @Getter
-    private MutableLiveData<ArrayList<Song>> Songs;
-
+    private MutableLiveData<ArrayList<Post>> posts;
 
     public PostsViewModel(@NonNull Application application) {
         super(application);
-        Songs = new MutableLiveData<>();
+        posts = new MutableLiveData<>();
     }
 }
