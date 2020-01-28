@@ -33,7 +33,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         posts = new ArrayList<>();
         postsAdaper = new PostsAdaper(getApplicationContext(), posts);
-        postsView = findViewById(R.id.RecyclerView);
         postsView.setLayoutManager(new LinearLayoutManager(this));
         model = ViewModelProviders.of(this).get(PostsViewModel.class);
         postsView.setAdapter(postsAdaper);

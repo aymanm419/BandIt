@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/home2">
+    <fragment
+        android:id="@+id/home2"
+        android:name="my.bandit.Home"
+        android:label="home_fragment"
+        tools:layout="@layout/home_fragment" >
+        <action
+            android:id="@+id/action_home2_to_favourite"
+            app:destination="@id/favourite" />
+        <action
+            android:id="@+id/action_home2_to_nowPlaying"
+            app:destination="@id/nowPlaying" />
+    </fragment>
+    <fragment
+        android:id="@+id/favourite"
+        android:name="my.bandit.Favourite"
+        android:label="favourite_fragment"
+        tools:layout="@layout/favourite_fragment" />
+    <fragment
+        android:id="@+id/nowPlaying"
+        android:name="my.bandit.NowPlaying"
+        android:label="now_playing_fragment"
+        tools:layout="@layout/now_playing_fragment" />
+</navigation>

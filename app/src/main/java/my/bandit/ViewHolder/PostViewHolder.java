@@ -27,6 +27,6 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
         UnlikeImageView = itemView.findViewById(R.id.PostUnlikeImage);
         HeartImageView = itemView.findViewById(R.id.PostHeartImage);
         SongProgressBar = itemView.findViewById(R.id.PostProgressBar);
-        albumPicture = itemView.findViewById(R.id.albumPicture);
+        albumPicture = itemView.findViewById(R.id.PostAlbumPicture);
     }
 }
