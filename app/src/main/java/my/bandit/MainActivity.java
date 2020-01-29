@@ -4,8 +4,6 @@ import android.os.Bundle;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProviders;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -31,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        posts = new ArrayList<>();
+        /*posts = new ArrayList<>();
         postsAdaper = new PostsAdaper(getApplicationContext(), posts);
         postsView.setLayoutManager(new LinearLayoutManager(this));
         model = ViewModelProviders.of(this).get(PostsViewModel.class);
@@ -39,6 +37,6 @@ public class MainActivity extends AppCompatActivity {
         model.getPosts().observe(this, updatedList -> {
             postsAdaper.setPosts(updatedList);
             postsAdaper.notifyDataSetChanged();
-        });
+        });*/
     }
 }
