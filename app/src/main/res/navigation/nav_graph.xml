@@ -3,12 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/home2">
+    app:startDestination="@id/home">
     <fragment
-        android:id="@+id/home2"
+        android:id="@+id/home"
         android:name="my.bandit.Home"
         android:label="home_fragment"
-        tools:layout="@layout/home_fragment" >
+        tools:layout="@layout/home_fragment">
         <action
             android:id="@+id/action_home2_to_favourite"
             app:destination="@id/favourite" />
@@ -26,4 +26,9 @@
         android:name="my.bandit.NowPlaying"
         android:label="now_playing_fragment"
         tools:layout="@layout/now_playing_fragment" />
+    <fragment
+        android:id="@+id/search"
+        android:name="my.bandit.Search"
+        android:label="search_fragment"
+        tools:layout="@layout/search_fragment" />
 </navigation>
