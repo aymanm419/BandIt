@@ -1,4 +1,4 @@
-package my.bandit;
+package my.bandit.ViewModel;
 
 import androidx.lifecycle.ViewModel;
 

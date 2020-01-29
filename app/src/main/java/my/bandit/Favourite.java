@@ -12,6 +12,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import my.bandit.ViewModel.FavouriteViewModel;
+
 public class Favourite extends Fragment {
 
     private FavouriteViewModel mViewModel;

@@ -12,6 +12,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import my.bandit.ViewModel.NowPlayingViewModel;
+
 public class NowPlaying extends Fragment {
 
     private NowPlayingViewModel mViewModel;
