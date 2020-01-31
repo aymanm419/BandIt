@@ -1,18 +1,11 @@
 package my.bandit.FilesDownloader;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ImageView;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.target.CustomTarget;
-import com.bumptech.glide.request.transition.Transition;
 
 import org.apache.commons.net.ftp.FTPClient;
 
@@ -59,17 +52,6 @@ public class DownloadImageTask extends AsyncTask<String, Void, File> {
     @Override
     protected void onPostExecute(File file) {
         super.onPostExecute(file);
-        Glide.with(mContext).asBitmap().load(file).into(new CustomTarget<Bitmap>() {
-            @Override
-            public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-                Glide.with(mContext)
-                        .load(resource)
-                        .into(imageView);
-            }
-
-            @Override
-            public void onLoadCleared(@Nullable Drawable placeholder) {
-            }
-        });
+        Glide.with(mContext).load(file).into(imageView);
     }
 }
