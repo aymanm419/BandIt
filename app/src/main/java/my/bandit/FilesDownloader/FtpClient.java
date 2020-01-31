@@ -30,26 +30,27 @@ class FtpClient {
     }
 
     synchronized FTPClient getConnection() throws ExecutionException, InterruptedException {
-        Log.i("FTPConnection", "Fetching Connection");
+        Log.d("FTPConnection", "Fetching Connection");
         if (connectionsPool.isEmpty()) {
             FTPClientCreator ftpClientCreator = new FTPClientCreator();
             FutureTask<FTPClient> clientFutureTask = new FutureTask<>(ftpClientCreator);
             Thread thread = new Thread(clientFutureTask);
             thread.start();
             thread.join();
+            Log.d("Connected Fetched ", clientFutureTask.get().toString());
             return clientFutureTask.get();
         }
         FTPClient ftpClient = connectionsPool.get(0);
         connectionsPool.remove(0);
+        Log.d("Connected Fetched ", ftpClient.toString());
         return ftpClient;
     }
 
-    void releaseConnection(FTPClient client) {
+    synchronized void releaseConnection(FTPClient client) {
         connectionsPool.add(client);
     }
 
     private static class FTPClientCreator implements Callable<FTPClient> {
-
         @Override
         public FTPClient call() throws Exception {
             FTPClient client = new FTPClient();

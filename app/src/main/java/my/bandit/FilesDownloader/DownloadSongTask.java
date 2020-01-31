@@ -24,12 +24,12 @@ public class DownloadSongTask extends AsyncTask<String, Void, File> {
             final String remoteDirectory = strings[0];
             File downloadFile = new File(localDirectory);
             OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(downloadFile));
-            Log.i("FTPClientTask", "Initiated Downloading.");
+            Log.d("FTPClientTask", "Initiated Downloading.");
             boolean success = client.retrieveFile(remoteDirectory, outputStream);
             if (success)
-                Log.i("FTPClientTask", "Downloaded successfully!");
+                Log.d("FTPClientTask", "Downloaded successfully!");
             else
-                Log.i("FTPClientTask", "Download Failed!");
+                Log.d("FTPClientTask", "Download Failed!");
             outputStream.close();
             FtpClient.getInstance().releaseConnection(client);
             return downloadFile;

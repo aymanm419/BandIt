@@ -1,22 +1,25 @@
 package my.bandit.FilesDownloader;
 
 import android.content.Context;
-import android.graphics.BitmapFactory;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ImageView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 
 import org.apache.commons.net.ftp.FTPClient;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.concurrent.ExecutionException;
 
@@ -38,12 +41,12 @@ public class DownloadImageTask extends AsyncTask<String, Void, File> {
             final String remoteDirectory = strings[0];
             File downloadFile = new File(localDirectory);
             OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(downloadFile));
-            Log.i("FTPClientTask", "Initiated Downloading.");
+            Log.d("FTPClientTask", "Initiated Downloading.");
             boolean success = client.retrieveFile(remoteDirectory, outputStream);
             if (success)
-                Log.i("FTPClientTask", "Downloaded successfully!");
+                Log.d("FTPClientTask", "Downloaded successfully!");
             else
-                Log.i("FTPClientTask", "Download Failed!");
+                Log.d("FTPClientTask", "Download Failed!");
             outputStream.close();
             FtpClient.getInstance().releaseConnection(client);
             return downloadFile;
@@ -56,14 +59,17 @@ public class DownloadImageTask extends AsyncTask<String, Void, File> {
     @Override
     protected void onPostExecute(File file) {
         super.onPostExecute(file);
-        try {
-            InputStream inputStream = new FileInputStream(file);
-            Glide.with(mContext)
-                    .load(BitmapFactory.decodeStream(inputStream))
-                    .into(imageView);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+        Glide.with(mContext).asBitmap().load(file).into(new CustomTarget<Bitmap>() {
+            @Override
+            public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                Glide.with(mContext)
+                        .load(resource)
+                        .into(imageView);
+            }
 
+            @Override
+            public void onLoadCleared(@Nullable Drawable placeholder) {
+            }
+        });
     }
 }
