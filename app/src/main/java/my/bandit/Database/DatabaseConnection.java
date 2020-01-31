@@ -29,6 +29,7 @@ public class DatabaseConnection {
             FutureTask<Connection> connectionFutureTask = new FutureTask<>(callable);
             Thread thread = new Thread(connectionFutureTask);
             thread.start();
+            thread.join();
             return connectionFutureTask.get();
         }
         Connection connection = connectionsPool.get(0);
@@ -46,6 +47,7 @@ public class DatabaseConnection {
             Connection connection = null;
             try {
                 Class.forName("com.mysql.jdbc.Driver").newInstance();
+                DriverManager.setLoginTimeout(3);
                 connection = DriverManager.getConnection(DatabaseCredentials.URL, DatabaseCredentials.USER, DatabaseCredentials.PASSWORD);
             } catch (SQLException | IllegalAccessException | InstantiationException | ClassNotFoundException e) {
                 e.printStackTrace();

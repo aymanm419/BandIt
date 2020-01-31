@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
 
 import my.bandit.Model.Post;
 import my.bandit.Repository.PostsLoader;
@@ -47,12 +46,8 @@ public class Home extends Fragment {
             postsAdaper.notifyDataSetChanged();
         });
         refreshButton.setOnClickListener(v -> {
-            PostsLoader postsLoader = new PostsLoader();
-            try {
-                mViewModel.getPosts().postValue(postsLoader.execute().get());
-            } catch (ExecutionException | InterruptedException e) {
-                e.printStackTrace();
-            }
+            PostsLoader postsLoader = new PostsLoader(mViewModel);
+            postsLoader.execute();
         });
         return view;
     }

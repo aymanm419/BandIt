@@ -12,8 +12,14 @@ import java.util.concurrent.ExecutionException;
 import my.bandit.Database.DatabaseConnection;
 import my.bandit.Model.Post;
 import my.bandit.Model.Song;
+import my.bandit.ViewModel.PostsViewModel;
 
 public class PostsLoader extends AsyncTask<Void, Void, ArrayList<Post>> {
+    PostsViewModel postsViewModel;
+
+    public PostsLoader(PostsViewModel postsViewModel) {
+        this.postsViewModel = postsViewModel;
+    }
     public ArrayList<Post> LoadPosts() throws ExecutionException, InterruptedException, SQLException {
         DatabaseConnection databaseConnection = DatabaseConnection.getInstance();
         Connection connection = databaseConnection.getConnection();
@@ -40,5 +46,11 @@ public class PostsLoader extends AsyncTask<Void, Void, ArrayList<Post>> {
             e.printStackTrace();
         }
         return null;
+    }
+
+    @Override
+    protected void onPostExecute(ArrayList<Post> posts) {
+        super.onPostExecute(posts);
+        postsViewModel.getPosts().postValue(posts);
     }
 }
