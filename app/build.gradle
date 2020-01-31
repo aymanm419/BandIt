@@ -24,9 +24,9 @@ android {
 
 dependencies {
     def nav_version = "2.2.0"
-
     implementation "androidx.navigation:navigation-fragment:$nav_version"
     implementation "androidx.navigation:navigation-ui:$nav_version"
+
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     apply plugin: "androidx.navigation.safeargs"
     implementation 'androidx.appcompat:appcompat:1.0.2'
@@ -46,7 +46,10 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation 'androidx.cardview:cardview:1.0.0'
-    implementation files('libs\\mysql-connector-java-5.1.48-bin.jar')
     implementation 'com.google.android.material:material:1.0.0'
-    implementation fileTree(dir: 'libs', include: ['*.aar', '*.jar'], exclude: [])
+    implementation('commons-net:commons-net:3.6'){
+        exclude module: 'commons.net.DatagramSocketClient'
+    }
+    implementation files('libs\\mysql-connector-java-5.1.48-bin.jar')
+
 }

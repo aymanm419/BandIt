@@ -1,34 +1,15 @@
 package my.bandit;
 
 import android.os.Bundle;
-import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
-
-import my.bandit.Model.Post;
-import my.bandit.Repository.PostsLoader;
-import my.bandit.ViewAdapter.PostsAdaper;
-import my.bandit.ViewModel.PostsViewModel;
-
 public class MainActivity extends AppCompatActivity {
-    RecyclerView postsView;
-    ArrayList<Post> posts;
-    PostsAdaper postsAdaper;
-    private PostsViewModel model;
-
-    public void addSong(View view) throws InterruptedException, ExecutionException {
-        PostsLoader postsLoader = new PostsLoader();
-        model.getPosts().postValue(postsLoader.execute().get());
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,14 +18,5 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView bottomNavigationView = findViewById(R.id.NavView);
         NavController navController = Navigation.findNavController(this, R.id.fragment);
         NavigationUI.setupWithNavController(bottomNavigationView, navController);
-        /*posts = new ArrayList<>();
-        postsAdaper = new PostsAdaper(getApplicationContext(), posts);
-        postsView.setLayoutManager(new LinearLayoutManager(this));
-        model = ViewModelProviders.of(this).get(PostsViewModel.class);
-        postsView.setAdapter(postsAdaper);
-        model.getPosts().observe(this, updatedList -> {
-            postsAdaper.setPosts(updatedList);
-            postsAdaper.notifyDataSetChanged();
-        });*/
     }
 }

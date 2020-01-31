@@ -1,7 +1,5 @@
 package my.bandit.Model;
 
-import java.io.File;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,11 +9,11 @@ public class Song {
     private String songName, albumName;
     @Getter
     @Setter
-    private File songFile;
+    private String songFileDir;
 
-    public Song(String songName, String albumName, File file) {
+    public Song(String songName, String albumName, String songFileDir) {
         this.songName = songName;
         this.albumName = albumName;
-        this.songFile = file;
+        this.songFileDir = songFileDir;
     }
 }

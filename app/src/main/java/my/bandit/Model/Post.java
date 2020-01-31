@@ -1,18 +1,16 @@
 package my.bandit.Model;
 
-import android.graphics.Bitmap;
-
 import lombok.Getter;
 
 public class Post {
     @Getter
     private Song song;
     @Getter
-    private Bitmap picture;
+    private String pictureDir;
     private int postID;
 
-    public Post(Song song, Bitmap picture) {
+    public Post(Song song, String pictureDir) {
         this.song = song;
-        this.picture = picture;
+        this.pictureDir = pictureDir;
     }
 }
