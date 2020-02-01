@@ -15,6 +15,9 @@
         <action
             android:id="@+id/action_home2_to_nowPlaying"
             app:destination="@id/nowPlaying" />
+        <action
+            android:id="@+id/action_home_to_search"
+            app:destination="@id/search" />
     </fragment>
     <fragment
         android:id="@+id/favourite"

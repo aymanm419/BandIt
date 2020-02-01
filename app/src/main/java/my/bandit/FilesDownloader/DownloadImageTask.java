@@ -39,7 +39,7 @@ public class DownloadImageTask extends AsyncTask<String, Void, File> {
             if (success)
                 Log.d("FTPClientTask", "Downloaded successfully!");
             else
-                Log.d("FTPClientTask", "Download Failed!");
+                    Log.d("FTPClientTask", "Download Failed!");
             outputStream.close();
             FtpClient.getInstance().releaseConnection(client);
             return downloadFile;
