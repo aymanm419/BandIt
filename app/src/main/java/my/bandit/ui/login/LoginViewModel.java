@@ -1,7 +1,6 @@
 package my.bandit.ui.login;
 
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -17,9 +16,10 @@ public class LoginViewModel extends ViewModel {
 
     private MutableLiveData<LoginFormState> loginFormState = new MutableLiveData<>();
     private MutableLiveData<LoginResult> loginResult = new MutableLiveData<>();
-    private LoginRepository loginRepository =LoginRepository.getInstance(new LoginDataSource());
+    private LoginRepository loginRepository = LoginRepository.getInstance(new LoginDataSource());
 
-    public LoginViewModel() {}
+    public LoginViewModel() {
+    }
 
     LoginViewModel(LoginRepository loginRepository) {
         this.loginRepository = loginRepository;
@@ -38,26 +38,25 @@ public class LoginViewModel extends ViewModel {
         Result<LoggedInUser> result = loginRepository.login(username, password);
 
         if (result instanceof Result.Success) {
-            Log.i("Login","Successful login.");
-            LoggedInUser data = ((Result.Success<LoggedInUser>) result).getData();
+            Log.i("Login", "Successful login.");
             loginResult.setValue(new LoginResult(true));
         } else {
-            Log.i("Login","Unsuccessful login.");
+            Log.i("Login", "Unsuccessful login.");
             loginResult.setValue(new LoginResult(R.string.login_failed));
         }
     }
 
     public boolean validateData(String username, String password) {
-        if (!isUserNameValid(username) || !isPasswordValid(password))
+        if (isUsernameInvalid(username) || isPasswordInvalid(password))
             return false;
         else
             return true;
     }
 
     public void loginDataChanged(String username, String password) {
-        if (!isUserNameValid(username)) {
+        if (isUsernameInvalid(username)) {
             loginFormState.setValue(new LoginFormState(R.string.invalid_username, null));
-        } else if (!isPasswordValid(password)) {
+        } else if (isPasswordInvalid(password)) {
             loginFormState.setValue(new LoginFormState(null, R.string.invalid_password));
         } else {
             loginFormState.setValue(new LoginFormState(true));
@@ -65,19 +64,19 @@ public class LoginViewModel extends ViewModel {
     }
 
     // A placeholder username validation check
-    private boolean isUserNameValid(String username) {
+    private boolean isUsernameInvalid(String username) {
         if (username == null) {
-            return false;
+            return true;
         }
         if (username.length() >= 4 && username.length() < 14) {
-            return true;
-        } else {
             return false;
+        } else {
+            return true;
         }
     }
 
     // A placeholder password validation check
-    private boolean isPasswordValid(String password) {
-        return password != null && password.trim().length() > 5;
+    private boolean isPasswordInvalid(String password) {
+        return password == null || password.trim().length() <= 5;
     }
 }
