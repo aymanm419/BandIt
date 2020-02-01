@@ -1,6 +1,7 @@
 package my.bandit.Repository;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -15,7 +16,7 @@ import my.bandit.Model.Song;
 import my.bandit.ViewModel.PostsViewModel;
 
 public class PostsLoader extends AsyncTask<Void, Void, ArrayList<Post>> {
-    PostsViewModel postsViewModel;
+    private PostsViewModel postsViewModel;
 
     public PostsLoader(PostsViewModel postsViewModel) {
         this.postsViewModel = postsViewModel;
@@ -23,6 +24,10 @@ public class PostsLoader extends AsyncTask<Void, Void, ArrayList<Post>> {
     public ArrayList<Post> LoadPosts() throws ExecutionException, InterruptedException, SQLException {
         DatabaseConnection databaseConnection = DatabaseConnection.getInstance();
         Connection connection = databaseConnection.getConnection();
+        if (connection == null) {
+            Log.d("Database Connection", "Can not connect to db.");
+            return new ArrayList<>();
+        }
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery("select * from posts");
         ArrayList<Post> postsLoaded = new ArrayList<>();

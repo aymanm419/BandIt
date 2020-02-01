@@ -14,16 +14,16 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.ref.WeakReference;
 import java.util.concurrent.ExecutionException;
 
 
 public class DownloadImageTask extends AsyncTask<String, Void, File> {
-    private ImageView imageView;
-    private Context mContext;
-
+    private WeakReference<ImageView> imageViewRef;
+    private WeakReference<Context> mContextRef;
     public DownloadImageTask(Context mContext, ImageView imageView) {
-        this.imageView = imageView;
-        this.mContext = mContext;
+        this.imageViewRef = new WeakReference<>(imageView);
+        this.mContextRef = new WeakReference<>(mContext);
     }
 
     @Override
@@ -52,6 +52,9 @@ public class DownloadImageTask extends AsyncTask<String, Void, File> {
     @Override
     protected void onPostExecute(File file) {
         super.onPostExecute(file);
-        Glide.with(mContext).load(file).into(imageView);
+        final ImageView imageView = imageViewRef.get();
+        final Context mContext = mContextRef.get();
+        if (imageView != null && mContext != null)
+            Glide.with(mContext).load(file).into(imageView);
     }
 }

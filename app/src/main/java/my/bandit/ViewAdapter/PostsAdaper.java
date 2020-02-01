@@ -18,12 +18,12 @@ import my.bandit.ViewHolder.PostViewHolder;
 
 public class PostsAdaper extends RecyclerView.Adapter<PostViewHolder> {
     @Setter
-    List<Post> posts;
-    Context mContext;
+    private List<Post> posts;
+    private Context mContext;
 
-    public PostsAdaper(Context mContext, ArrayList<Post> Posts) {
+    public PostsAdaper(Context mContext, ArrayList<Post> posts) {
         this.mContext = mContext;
-        posts = Posts;
+        this.posts = posts;
     }
 
     @NonNull
@@ -34,13 +34,11 @@ public class PostsAdaper extends RecyclerView.Adapter<PostViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull PostViewHolder holder, int position) {
-        holder.getPostTextView().setText(posts.get(position).getSong().getSongName());
-        holder.getPostAlbumTextView().setText(posts.get(position).getSong().getAlbumName());
+        final Post currentPost = posts.get(position);
+        holder.getPostTextView().setText(currentPost.getSong().getSongName());
+        holder.getPostAlbumTextView().setText(currentPost.getSong().getAlbumName());
         DownloadImageTask downloadImageTask = new DownloadImageTask(mContext, holder.getAlbumPicture());
-        downloadImageTask.execute(posts.get(position).getPictureDir(), mContext.getFilesDir() + "/krutch.jpg");
-        // DownloadSongTask downloadSongTask = new DownloadSongTask();
-        //downloadSongTask.execute(posts.get(position).getSong().getSongFileDir(),mContext.getFilesDir() + "/" +
-        //  posts.get(position).getSong().getSongName() + ".mp3");
+        downloadImageTask.execute(currentPost.getPictureDir(), mContext.getFilesDir() + currentPost.getSong().getAlbumName());
     }
 
     @Override
