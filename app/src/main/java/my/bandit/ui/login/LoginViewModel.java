@@ -6,7 +6,10 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import java.util.concurrent.ExecutionException;
+
 import my.bandit.R;
+import my.bandit.Repository.AccountRegister;
 import my.bandit.data.LoginDataSource;
 import my.bandit.data.LoginRepository;
 import my.bandit.data.Result;
@@ -46,11 +49,24 @@ public class LoginViewModel extends ViewModel {
         }
     }
 
+    public Result<LoggedInUser> register(String username, String password) {
+        Result<LoggedInUser> result;
+        try {
+            result = new AccountRegister().execute(username, password).get();
+        } catch (ExecutionException | InterruptedException e) {
+            return new Result.Error(new Exception("Failed to connect"));
+        }
+
+        if (result instanceof Result.Success) {
+            Log.i("Register", "Successful register.");
+        } else {
+            Log.i("Register", "Unsuccessful register.");
+        }
+        return result;
+    }
+
     public boolean validateData(String username, String password) {
-        if (isUsernameInvalid(username) || isPasswordInvalid(password))
-            return false;
-        else
-            return true;
+        return !isUsernameInvalid(username) && !isPasswordInvalid(password);
     }
 
     public void loginDataChanged(String username, String password) {
@@ -68,11 +84,7 @@ public class LoginViewModel extends ViewModel {
         if (username == null) {
             return true;
         }
-        if (username.length() >= 4 && username.length() < 14) {
-            return false;
-        } else {
-            return true;
-        }
+        return username.length() < 4 || username.length() >= 14;
     }
 
     // A placeholder password validation check

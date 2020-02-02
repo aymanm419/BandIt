@@ -30,7 +30,8 @@ public class LoginActivity extends AppCompatActivity {
     private EditText passwordEditText;
     private CheckBox rememberMe;
 
-    private String username,password;
+    private String username, password;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,7 +54,7 @@ public class LoginActivity extends AppCompatActivity {
             setResult(Activity.RESULT_OK);
 
             //Complete and destroy login activity once successful
-            finish();
+
         });
 
         TextWatcher afterTextChangedListener = new TextWatcher() {
@@ -85,6 +86,13 @@ public class LoginActivity extends AppCompatActivity {
         loginViewModel.login(username, password);
     }
 
+    public void registerFunction(View view) {
+        Log.d("Register", "Button pressed");
+        username = usernameEditText.getText().toString();
+        password = passwordEditText.getText().toString();
+        Toast.makeText(getApplicationContext(), loginViewModel.register(username, password).toString(), Toast.LENGTH_LONG).show();
+    }
+
     public void LoginFunction(View view) {
         Log.i("Login", "Button pressed");
         username = usernameEditText.getText().toString();
@@ -112,6 +120,7 @@ public class LoginActivity extends AppCompatActivity {
         Intent mainAct = new Intent(getApplicationContext(), MainActivity.class);
         Toast.makeText(getApplicationContext(), "Welcome, " + username, Toast.LENGTH_LONG).show();
         startActivity(mainAct);
+        finish();
     }
 
     private void showLoginFailed(@StringRes Integer errorString) {

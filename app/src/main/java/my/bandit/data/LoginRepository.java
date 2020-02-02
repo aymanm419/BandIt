@@ -1,5 +1,8 @@
 package my.bandit.data;
 
+import java.util.concurrent.ExecutionException;
+
+import my.bandit.Repository.AccountRegister;
 import my.bandit.data.model.LoggedInUser;
 
 /**
@@ -26,6 +29,15 @@ public class LoginRepository {
             instance = new LoginRepository(dataSource);
         }
         return instance;
+    }
+
+    private void register(String username, String password) {
+        String[] args = {username,password};
+        try {
+            new AccountRegister().execute(args).get();
+        } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public boolean isLoggedIn() {
