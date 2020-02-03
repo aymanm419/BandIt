@@ -21,6 +21,7 @@ public class PostsLoader extends AsyncTask<Void, Void, ArrayList<Post>> {
     public PostsLoader(PostsViewModel postsViewModel) {
         this.postsViewModel = postsViewModel;
     }
+
     public ArrayList<Post> LoadPosts() throws ExecutionException, InterruptedException, SQLException {
         DatabaseConnection databaseConnection = DatabaseConnection.getInstance();
         Connection connection = databaseConnection.getConnection();
