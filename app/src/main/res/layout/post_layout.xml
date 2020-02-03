@@ -1,22 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="185dp">
+    android:layout_height="175dp">
 
     <androidx.cardview.widget.CardView
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="15dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginEnd="10dp"
-        android:layout_marginBottom="10dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0">
+        android:id="@+id/cardView"
+        android:layout_width="500dp"
+        android:layout_height="200dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="40dp">
 
         <TextView
             android:id="@+id/PostSongName"
@@ -56,21 +51,12 @@
                 app:srcCompat="@android:color/background_dark" />
         </androidx.cardview.widget.CardView>
 
-        <ProgressBar
-            android:id="@+id/PostProgressBar"
-            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-            android:layout_width="250dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="125dp"
-            android:layout_marginTop="80dp"
-            android:progress="0" />
-
         <ImageView
             android:id="@+id/PostLikeImage"
             android:layout_width="35dp"
             android:layout_height="35dp"
-            android:layout_marginStart="310dp"
-            android:layout_marginTop="120dp"
+            android:layout_marginStart="300dp"
+            android:layout_marginTop="80dp"
             app:srcCompat="@drawable/android_like_image" />
 
         <ImageView
@@ -78,16 +64,16 @@
             android:layout_width="35dp"
             android:layout_height="35dp"
             android:layout_marginStart="350dp"
-            android:layout_marginTop="120dp"
+            android:layout_marginTop="80dp"
             app:srcCompat="@drawable/android_unlike_image" />
 
         <ImageView
             android:id="@+id/PostHeartImage"
             android:layout_width="35dp"
             android:layout_height="35dp"
-            android:layout_marginStart="25dp"
-            android:layout_marginTop="120dp"
+            android:layout_marginStart="125dp"
+            android:layout_marginTop="80dp"
             app:srcCompat="@drawable/ic_favorite_black_24dp" />
 
     </androidx.cardview.widget.CardView>
-</androidx.constraintlayout.widget.ConstraintLayout>
+</RelativeLayout>

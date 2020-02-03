@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 
 import my.bandit.Model.Post;
-import my.bandit.ViewAdapter.PostsAdaper;
+import my.bandit.ViewAdapter.PostsAdapter;
 import my.bandit.ViewModel.FavouriteViewModel;
 
 public class Favourite extends Fragment {
@@ -24,7 +24,7 @@ public class Favourite extends Fragment {
     private FavouriteViewModel mViewModel;
     private RecyclerView postsView;
     private ArrayList<Post> posts;
-    private PostsAdaper postsAdaper;
+    private PostsAdapter postsAdaper;
 
     public static Favourite newInstance() {
         return new Favourite();
@@ -43,7 +43,7 @@ public class Favourite extends Fragment {
         Log.i("Favourite", "Attaching Model View");
         posts = new ArrayList<>();
         postsView = getView().findViewById(R.id.favList);
-        postsAdaper = new PostsAdaper(getActivity().getApplicationContext(), posts);
+        postsAdaper = new PostsAdapter(getActivity().getApplicationContext(), posts);
         postsView.setLayoutManager(new LinearLayoutManager(getContext()));
         postsView.setAdapter(postsAdaper);
         mViewModel.getPosts().observe(getViewLifecycleOwner(), updatedList -> {

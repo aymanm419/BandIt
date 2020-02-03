@@ -17,14 +17,14 @@ import java.util.ArrayList;
 
 import my.bandit.Model.Post;
 import my.bandit.Repository.PostsLoader;
-import my.bandit.ViewAdapter.PostsAdaper;
+import my.bandit.ViewAdapter.PostsAdapter;
 import my.bandit.ViewModel.PostsViewModel;
 
 public class Home extends Fragment {
 
     private PostsViewModel mViewModel;
     private ArrayList<Post> posts;
-    private PostsAdaper postsAdaper;
+    private PostsAdapter postsAdaper;
     private RecyclerView postsView;
     private Button refreshButton;
     public static Home newInstance() {
@@ -37,7 +37,7 @@ public class Home extends Fragment {
         postsView = view.findViewById(R.id.recyclerView);
         refreshButton = view.findViewById(R.id.refreshButton);
         posts = new ArrayList<>();
-        postsAdaper = new PostsAdaper(getContext(), posts);
+        postsAdaper = new PostsAdapter(getContext(), posts);
         postsView.setLayoutManager(new LinearLayoutManager(view.getContext()));
         mViewModel = new ViewModelProvider(this).get(PostsViewModel.class);
         postsView.setAdapter(postsAdaper);

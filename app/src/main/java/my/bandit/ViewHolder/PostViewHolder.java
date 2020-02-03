@@ -2,10 +2,10 @@ package my.bandit.ViewHolder;
 
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import lombok.Getter;
@@ -17,8 +17,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
     @Getter
     private ImageView LikeImageView, UnlikeImageView, HeartImageView, albumPicture;
     @Getter
-    private ProgressBar SongProgressBar;
-
+    private CardView cardView;
     public PostViewHolder(@NonNull View itemView) {
         super(itemView);
         postTextView = itemView.findViewById(R.id.PostSongName);
@@ -26,7 +25,7 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
         LikeImageView = itemView.findViewById(R.id.PostLikeImage);
         UnlikeImageView = itemView.findViewById(R.id.PostUnlikeImage);
         HeartImageView = itemView.findViewById(R.id.PostHeartImage);
-        SongProgressBar = itemView.findViewById(R.id.PostProgressBar);
         albumPicture = itemView.findViewById(R.id.PostAlbumPicture);
+        cardView = itemView.findViewById(R.id.cardView);
     }
 }
