@@ -1,7 +1,6 @@
 package my.bandit;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,8 +8,6 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -39,18 +36,6 @@ public class Favourite extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mViewModel = new ViewModelProvider(this).get(FavouriteViewModel.class);
-        Log.i("Favourite", "Attaching Model View");
-        posts = new ArrayList<>();
-        postsView = getView().findViewById(R.id.favList);
-        postsAdaper = new PostsAdapter(getActivity().getApplicationContext(), posts);
-        postsView.setLayoutManager(new LinearLayoutManager(getContext()));
-        postsView.setAdapter(postsAdaper);
-        mViewModel.getPosts().observe(getViewLifecycleOwner(), updatedList -> {
-            Log.i("Database", "Fetching new favourites");
-            postsAdaper.setPosts(updatedList);
-            postsAdaper.notifyDataSetChanged();
-        });
     }
 
 }

@@ -12,7 +12,6 @@ import java.util.List;
 
 import lombok.Setter;
 import my.bandit.FilesDownloader.DownloadImageTask;
-import my.bandit.FilesDownloader.DownloadSongTask;
 import my.bandit.Model.Post;
 import my.bandit.R;
 import my.bandit.ViewHolder.PostViewHolder;
@@ -21,10 +20,12 @@ public class PostsAdapter extends RecyclerView.Adapter<PostViewHolder> {
     @Setter
     private List<Post> posts;
     private Context mContext;
+    private PostClick postClick;
 
-    public PostsAdapter(Context mContext, ArrayList<Post> posts) {
+    public PostsAdapter(Context mContext, ArrayList<Post> posts, PostClick postClick) {
         this.mContext = mContext;
         this.posts = posts;
+        this.postClick = postClick;
     }
 
     @NonNull
@@ -41,10 +42,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostViewHolder> {
         DownloadImageTask downloadImageTask = new DownloadImageTask(mContext, holder.getAlbumPicture());
         downloadImageTask.execute(currentPost.getPictureDir(), mContext.getFilesDir() + currentPost.getSong().getAlbumName());
         holder.getCardView().setOnClickListener(v -> {
-
-            DownloadSongTask downloadSongTask = new DownloadSongTask(mContext);
-            downloadSongTask.execute(currentPost.getSong().getSongFileDir(),
-                    mContext.getFilesDir() + currentPost.getSong().getSongName());
+            postClick.onClick(currentPost);
         });
     }
 
