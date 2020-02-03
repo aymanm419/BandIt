@@ -66,6 +66,7 @@ public class LoginViewModel extends ViewModel {
     }
 
     public boolean validateData(String username, String password) {
+        loginResult.setValue(new LoginResult(false));
         return !isUsernameInvalid(username) && !isPasswordInvalid(password);
     }
 

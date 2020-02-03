@@ -15,25 +15,26 @@ import my.bandit.data.model.LoggedInUser;
 
 public class AccountLoader extends AsyncTask<String, String, LoggedInUser> {
 
+    LoggedInUser user;
     private ArrayList<Integer> favourites = new ArrayList<>();
     private ArrayList<Integer> like = new ArrayList<>();
     private ArrayList<Integer> dislike = new ArrayList<>();
 
-    private void fetchLists(String username, Statement statement) throws SQLException {
+    private void fetchLists(Statement statement) throws SQLException {
         Log.d("Login", "Fetching likes");
-        ResultSet resultSet = statement.executeQuery("select * from " + username + "Likes ");
+        ResultSet resultSet = statement.executeQuery("select * from likes where ID = " + user.getUserId());
         while (resultSet.next()) {
-            like.add(resultSet.getInt("ID"));
+            like.add(resultSet.getInt("postID"));
         }
         Log.d("Login", "Fetching dislikes");
-        resultSet = statement.executeQuery("select * from " + username + "Dislikes ");
+        resultSet = statement.executeQuery("select * from dislikes where ID = " + user.getUserId());
         while (resultSet.next()) {
-            dislike.add(resultSet.getInt("ID"));
+            dislike.add(resultSet.getInt("postID"));
         }
         Log.d("Login", "Fetching favourites");
-        resultSet = statement.executeQuery("select * from " + username + "Favourites ");
+        resultSet = statement.executeQuery("select * from favourites where ID = " + user.getUserId());
         while (resultSet.next()) {
-            favourites.add(resultSet.getInt("ID"));
+            favourites.add(resultSet.getInt("postID"));
         }
     }
 
@@ -50,8 +51,8 @@ public class AccountLoader extends AsyncTask<String, String, LoggedInUser> {
         while (resultSet.next()) {
             id = resultSet.getInt("ID");
         }
-        LoggedInUser user = new LoggedInUser(id, username);
-        fetchLists(username, statement);
+        user = new LoggedInUser(id, username);
+        fetchLists(statement);
         user.setDisliked(dislike);
         user.setFavourites(favourites);
         user.setLiked(like);

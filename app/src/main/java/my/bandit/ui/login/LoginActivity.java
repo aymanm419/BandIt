@@ -98,12 +98,11 @@ public class LoginActivity extends AppCompatActivity {
         username = usernameEditText.getText().toString();
         password = passwordEditText.getText().toString();
         LogUser(username, password);
-        if (loginViewModel.getLoginResult().getValue().getSuccess() && rememberMe.isChecked()) {
+        if (rememberMe.isChecked() && loginViewModel.getLoginResult().getValue().getSuccess()) {
             Log.i("Login", "Saving login data");
             SharedPreferences savedData = this.getPreferences(Context.MODE_PRIVATE);
             savedData.edit().putString("Username", username).apply();
             savedData.edit().putString("Password", password).apply();
-
         }
     }
 

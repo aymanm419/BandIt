@@ -22,10 +22,6 @@ public class AccountRegister extends AsyncTask<String, String, Result> {
         Statement statement = connection.createStatement();
         Log.d("Register", "Creating table entry" + "INSERT INTO accounts(ID, username, password) VALUES (NULL, '" + username + "','" + password + "')");
         statement.execute("INSERT INTO accounts(ID, username, password) VALUES (NULL, '" + username + "','" + password + "')");
-        Log.d("Register", "Creating user tables");
-        statement.execute("CREATE TABLE " + username + "Likes (ID int);");
-        statement.execute("CREATE TABLE " + username + "Dislikes (ID int);");
-        statement.execute("CREATE TABLE " + username + "Favourite (ID int);");
     }
 
     private boolean checkIfUserExists(String username) throws SQLException, ExecutionException, InterruptedException {
