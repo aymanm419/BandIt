@@ -1,6 +1,5 @@
 package my.bandit;
 
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -21,6 +20,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
 
@@ -43,16 +43,16 @@ public class Home extends Fragment {
     private ArrayList<Post> posts;
     private PostsAdapter postsAdaper;
     private RecyclerView postsView;
+    final private ExecutorService pool = Executors.newCachedThreadPool();
     public static Home home;
-    private boolean mSeeking = false;
     private SeekBar seekBar;
     private ImageView stateImage;
-    private BroadcastReceiver receiver;
-    private boolean mBound = false;
+    private SwipeRefreshLayout swipeRefreshLayout;
     private MusicService musicService;
     private Handler handler;
-    private boolean timerRunning = false;
-    private Runnable updateSeekBar = this::updateSeekBar;
+    private boolean mBound;
+    private boolean timerRunning;
+    private Runnable updateSeekBar;
     private ServiceConnection connection = new ServiceConnection() {
 
         @Override
@@ -68,7 +68,7 @@ public class Home extends Fragment {
             mBound = false;
         }
     };
-    ExecutorService pool;
+
     public static Home newInstance() {
         if (home == null)
             home = new Home();
@@ -111,14 +111,13 @@ public class Home extends Fragment {
         });
         postsView.setLayoutManager(new LinearLayoutManager(view.getContext()));
         postsView.setAdapter(postsAdaper);
-        PostsLoader postsLoader = new PostsLoader(mViewModel);
-        postsLoader.execute();
     }
 
     private void AttachViews(final View view) {
         postsView = view.findViewById(R.id.recyclerView);
         seekBar = view.findViewById(R.id.seekBar);
         stateImage = view.findViewById(R.id.stateImage);
+        swipeRefreshLayout = view.findViewById(R.id.swiperefresh);
     }
 
     private void attachViewListeners(final View view) {
@@ -151,6 +150,10 @@ public class Home extends Fragment {
                     musicService.getMusicHandler().seek(seekBar.getProgress());
             }
         });
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            PostsLoader postsLoader = new PostsLoader(mViewModel, swipeRefreshLayout);
+            postsLoader.execute();
+        });
     }
 
     private void pauseTimer() {
@@ -169,9 +172,14 @@ public class Home extends Fragment {
                 seekBar.setProgress(musicService.getMediaPlayer().getCurrentPosition());
             }
         }
-        handler.postDelayed(updateSeekBar, 1000);
+        handler.postDelayed(updateSeekBar, 250);
     }
 
+    private void initVariables() {
+        continueTimer();
+        updateSeekBar = this::updateSeekBar;
+        handler = new Handler();
+    }
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -192,8 +200,7 @@ public class Home extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        handler = new Handler();
-        pool = Executors.newCachedThreadPool();
+        initVariables();
         AttachViews(getView());
         InitPostsView(getView());
         attachViewListeners(getView());
