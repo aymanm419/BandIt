@@ -76,6 +76,7 @@ public class Home extends Fragment {
             DownloadSongTask downloadSongTask = new DownloadSongTask(getContext());
             downloadSongTask.execute(post.getSong().getSongFileDir(),
                     view.getContext().getFilesDir() + post.getSong().getSongName());
+            PostsCache.getInstance().setLastPlayed(post);
             Glide.with(view).load(R.drawable.ic_play_arrow_black_24dp).into(stateImage);
             stateImage.setTag("playing");
         });

@@ -7,22 +7,22 @@ import lombok.Getter;
 import lombok.Setter;
 import my.bandit.Model.Post;
 
-public class SongsCache {
-    private static SongsCache songsCache;
+public class PostsCache {
+    private static PostsCache postsCache;
 
     private HashMap<String, File> cache;
     @Setter
     @Getter
     private Post lastPlayed;
 
-    private SongsCache() {
+    private PostsCache() {
         cache = new HashMap<>();
     }
 
-    public static synchronized SongsCache getInstance() {
-        if (songsCache == null)
-            songsCache = new SongsCache();
-        return songsCache;
+    public static synchronized PostsCache getInstance() {
+        if (postsCache == null)
+            postsCache = new PostsCache();
+        return postsCache;
     }
 
     public boolean isCached(String string) {

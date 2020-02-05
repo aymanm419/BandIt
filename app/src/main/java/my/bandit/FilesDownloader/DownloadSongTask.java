@@ -15,8 +15,8 @@ import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.util.concurrent.ExecutionException;
 
+import my.bandit.PostsCache;
 import my.bandit.Service.MusicService;
-import my.bandit.SongsCache;
 
 public class DownloadSongTask extends AsyncTask<String, Void, File> {
     private WeakReference<Context> mContext;
@@ -27,9 +27,9 @@ public class DownloadSongTask extends AsyncTask<String, Void, File> {
 
     @Override
     protected File doInBackground(String... strings) {
-        SongsCache songsCache = SongsCache.getInstance();
-        if (songsCache.isCached(strings[1]))
-            return songsCache.getSong(strings[1]);
+        PostsCache postsCache = PostsCache.getInstance();
+        if (postsCache.isCached(strings[1]))
+            return postsCache.getSong(strings[1]);
         try {
 
             FTPClient client = FtpClient.getInstance().getConnection();
@@ -57,8 +57,8 @@ public class DownloadSongTask extends AsyncTask<String, Void, File> {
         super.onPostExecute(file);
         Context context = mContext.get();
         if (context != null && file != null) {
-            SongsCache songsCache = SongsCache.getInstance();
-            songsCache.cacheSong(file.getAbsolutePath(), file);
+            PostsCache postsCache = PostsCache.getInstance();
+            postsCache.cacheSong(file.getAbsolutePath(), file);
             Intent intent = new Intent(context, MusicService.class);
             intent.putExtra("ACTION_CMD", MusicService.MUSIC_START);
             intent.putExtra("SONG", file);
