@@ -5,10 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Binder;
 import android.os.IBinder;
 
 import androidx.annotation.Nullable;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,17 +16,20 @@ import java.lang.ref.WeakReference;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import lombok.Getter;
+
 public class MusicService extends Service {
-    public final static int MUSIC_CONTINUE = 2;
     public final static int MUSIC_START = 1;
-    public final static int MUSIC_STOP = 0;
+    private final IBinder binder = new LocalBinder();
+    @Getter
     private MediaPlayer mediaPlayer;
-    private MusicPlayer musicPlayer;
+    @Getter
+    private MusicHandler musicHandler;
 
     @Override
     public void onCreate() {
         mediaPlayer = new MediaPlayer();
-        musicPlayer = new MusicPlayer(mediaPlayer, this);
+        musicHandler = new MusicHandler(mediaPlayer, this);
         super.onCreate();
     }
 
@@ -34,13 +37,14 @@ public class MusicService extends Service {
     public void onDestroy() {
         mediaPlayer.release();
         mediaPlayer = null;
+        musicHandler = null;
         super.onDestroy();
     }
 
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return binder;
     }
 
     @Override
@@ -50,27 +54,25 @@ public class MusicService extends Service {
         if (actionCmd == MUSIC_START) {
             File currentSong = (File) intent.getSerializableExtra("SONG");
             try {
-                musicPlayer.setDataSource(currentSong);
-                musicPlayer.startPlaying();
+                musicHandler.setDataSource(currentSong);
+                musicHandler.startPlaying();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        } else if (actionCmd == MUSIC_CONTINUE) {
-            musicPlayer.continuePlaying();
-        } else if (actionCmd == MUSIC_STOP) {
-            musicPlayer.stopPlaying();
         }
         return START_STICKY;
     }
 
-    private static class MusicPlayer {
+    public static class MusicHandler {
         private MediaPlayer mediaPlayer;
         private WeakReference<Context> mContext;
         private Timer timer;
+        @Getter
         private boolean timerRunning;
+        @Getter
         private boolean isPlaying = false;
 
-        MusicPlayer(MediaPlayer mediaPlayer, Context mContext) {
+        MusicHandler(MediaPlayer mediaPlayer, Context mContext) {
             this.mediaPlayer = mediaPlayer;
             this.mContext = new WeakReference<>(mContext);
             this.timerRunning = false;
@@ -90,16 +92,8 @@ public class MusicService extends Service {
                         }
                         if (!mediaPlayer.isPlaying())
                             mediaPlayer.start();
-                        Context context = mContext.get();
-                        if (context != null) {
-                            Intent broadcastIntent = new Intent();
-                            broadcastIntent.setAction("MEDIA_PLAYER_PROGRESS");
-                            broadcastIntent.putExtra("progress", mediaPlayer.getCurrentPosition());
-                            broadcastIntent.putExtra("maxProgress", mediaPlayer.getDuration());
-                            LocalBroadcastManager.getInstance(context).sendBroadcast(broadcastIntent);
-                        }
                     }
-                }, 0, 100);
+                }, 0, 250);
                 timerRunning = true;
             });
         }
@@ -128,6 +122,23 @@ public class MusicService extends Service {
 
         public void continuePlaying() {
             isPlaying = true;
+        }
+
+        public void seek(int progress) {
+            if (isTimerRunning())
+                mediaPlayer.seekTo(progress);
+        }
+
+        public int getMax() {
+            if (isTimerRunning())
+                return mediaPlayer.getDuration();
+            return 100;
+        }
+    }
+
+    public class LocalBinder extends Binder {
+        public MusicService getService() {
+            return MusicService.this;
         }
     }
 }
