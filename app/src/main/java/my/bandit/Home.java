@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.SeekBar;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,9 +23,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import my.bandit.FilesDownloader.DownloadSongTask;
 import my.bandit.Model.Post;
@@ -63,22 +68,40 @@ public class Home extends Fragment {
             mBound = false;
         }
     };
-
+    ExecutorService pool;
     public static Home newInstance() {
         if (home == null)
             home = new Home();
         return home;
     }
 
+    private void startSong(final View view, final File song) {
+        Intent intent = new Intent(view.getContext(), MusicService.class);
+        intent.putExtra("ACTION_CMD", MusicService.MUSIC_START);
+        intent.putExtra("SONG", song);
+        view.getContext().startService(intent);
+    }
+
     private void InitPostsView(final View view) {
         posts = new ArrayList<>();
         postsAdaper = new PostsAdapter(getContext(), posts, post -> {
-            DownloadSongTask downloadSongTask = new DownloadSongTask(getContext());
-            downloadSongTask.execute(post.getSong().getSongFileDir(),
-                    view.getContext().getFilesDir() + post.getSong().getSongName());
             PostsCache.getInstance().setLastPlayed(post);
             Glide.with(view).load(R.drawable.ic_play_arrow_black_24dp).into(stateImage);
             stateImage.setTag("playing");
+            Runnable runnable = () -> {
+                DownloadSongTask downloadSongTask = new DownloadSongTask();
+                try {
+                    File file = downloadSongTask.downloadFile(post.getSong().getSongFileDir(),
+                            view.getContext().getFilesDir() + post.getSong().getSongName());
+                    PostsCache postsCache = PostsCache.getInstance();
+                    postsCache.cacheSong(file.getAbsolutePath(), file);
+                    startSong(view, file);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Toast.makeText(view.getContext(), "Couldn't download songs!", Toast.LENGTH_SHORT).show();
+                }
+            };
+            pool.execute(runnable);
         });
         mViewModel = new ViewModelProvider(this).get(PostsViewModel.class);
         mViewModel.getPosts().observe(getViewLifecycleOwner(), updatedList -> {
@@ -95,6 +118,9 @@ public class Home extends Fragment {
         postsView = view.findViewById(R.id.recyclerView);
         seekBar = view.findViewById(R.id.seekBar);
         stateImage = view.findViewById(R.id.stateImage);
+    }
+
+    private void attachViewListeners(final View view) {
         stateImage.setOnClickListener(v -> {
             if (stateImage.getTag().toString().equals("playing")) {
                 Glide.with(view).load(R.drawable.ic_pause_black_24dp).into(stateImage);
@@ -109,38 +135,37 @@ public class Home extends Fragment {
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (fromUser && musicService.getMusicHandler().isTimerRunning())
-                    musicService.getMusicHandler().seek(progress);
+
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-                cancelTimer();
+                pauseTimer();
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                attachMusicRefresher();
+                continueTimer();
+                if (musicService.getMusicHandler().isTimerRunning())
+                    musicService.getMusicHandler().seek(seekBar.getProgress());
             }
         });
-
     }
 
-    private void cancelTimer() {
-        if (timerRunning) {
-            timer.cancel();
-            timer.purge();
-            timerRunning = false;
-        }
+    private void pauseTimer() {
+        timerRunning = false;
     }
 
+    private void continueTimer() {
+        timerRunning = true;
+    }
     private void attachMusicRefresher() {
         timerRunning = true;
         timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                if (mBound) {
+                if (mBound && timerRunning) {
                     if (musicService.getMusicHandler().isTimerRunning()) {
                         if (seekBar.getMax() != musicService.getMusicHandler().getMax())
                             seekBar.setMax(musicService.getMediaPlayer().getDuration());
@@ -148,7 +173,7 @@ public class Home extends Fragment {
                     }
                 }
             }
-        }, 0, 250);
+        }, 0, 500);
     }
 
     @Override
@@ -157,10 +182,15 @@ public class Home extends Fragment {
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        pool.shutdown();
+    }
+
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.home_fragment, container, false);
-        return view;
+        return inflater.inflate(R.layout.home_fragment, container, false);
     }
 
     @Override
@@ -168,10 +198,13 @@ public class Home extends Fragment {
         super.onActivityCreated(savedInstanceState);
         AttachViews(getView());
         InitPostsView(getView());
+        attachViewListeners(getView());
+        attachMusicRefresher();
         Intent intent = new Intent(getActivity().getApplicationContext(), MusicService.class);
         getView().getContext().startService(intent);
         getView().getContext().bindService(intent, connection, Context.BIND_AUTO_CREATE);
-        attachMusicRefresher();
+
+        pool = Executors.newCachedThreadPool();
     }
 
 }
