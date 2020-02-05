@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,8 +27,6 @@ import com.bumptech.glide.Glide;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -51,8 +50,9 @@ public class Home extends Fragment {
     private BroadcastReceiver receiver;
     private boolean mBound = false;
     private MusicService musicService;
-    private Timer timer;
+    private Handler handler;
     private boolean timerRunning = false;
+    private Runnable updateSeekBar = this::updateSeekBar;
     private ServiceConnection connection = new ServiceConnection() {
 
         @Override
@@ -96,6 +96,7 @@ public class Home extends Fragment {
                     PostsCache postsCache = PostsCache.getInstance();
                     postsCache.cacheSong(file.getAbsolutePath(), file);
                     startSong(view, file);
+                    continueTimer();
                 } catch (IOException e) {
                     e.printStackTrace();
                     Toast.makeText(view.getContext(), "Couldn't download songs!", Toast.LENGTH_SHORT).show();
@@ -159,21 +160,16 @@ public class Home extends Fragment {
     private void continueTimer() {
         timerRunning = true;
     }
-    private void attachMusicRefresher() {
-        timerRunning = true;
-        timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                if (mBound && timerRunning) {
-                    if (musicService.getMusicHandler().isTimerRunning()) {
-                        if (seekBar.getMax() != musicService.getMusicHandler().getMax())
-                            seekBar.setMax(musicService.getMediaPlayer().getDuration());
-                        seekBar.setProgress(musicService.getMediaPlayer().getCurrentPosition());
-                    }
-                }
+
+    private void updateSeekBar() {
+        if (mBound && timerRunning) {
+            if (musicService.getMusicHandler().isTimerRunning()) {
+                if (seekBar.getMax() != musicService.getMusicHandler().getMax())
+                    seekBar.setMax(musicService.getMediaPlayer().getDuration());
+                seekBar.setProgress(musicService.getMediaPlayer().getCurrentPosition());
             }
-        }, 0, 500);
+        }
+        handler.postDelayed(updateSeekBar, 1000);
     }
 
     @Override
@@ -196,15 +192,17 @@ public class Home extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        handler = new Handler();
+        pool = Executors.newCachedThreadPool();
         AttachViews(getView());
         InitPostsView(getView());
         attachViewListeners(getView());
-        attachMusicRefresher();
+        updateSeekBar();
         Intent intent = new Intent(getActivity().getApplicationContext(), MusicService.class);
         getView().getContext().startService(intent);
         getView().getContext().bindService(intent, connection, Context.BIND_AUTO_CREATE);
 
-        pool = Executors.newCachedThreadPool();
+
     }
 
 }
