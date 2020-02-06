@@ -1,8 +1,5 @@
 package my.bandit.FilesDownloader;
 
-import android.content.Context;
-import android.content.Intent;
-import android.os.AsyncTask;
 import android.util.Log;
 
 import org.apache.commons.net.ftp.FTPClient;
@@ -12,26 +9,21 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.ref.WeakReference;
 import java.util.concurrent.ExecutionException;
 
 import my.bandit.PostsCache;
-import my.bandit.Service.MusicService;
 
-public class DownloadSongTask extends AsyncTask<String, Void, File> {
-    private WeakReference<Context> mContext;
+public class DownloadSongTask {
 
-    public DownloadSongTask(Context mContext) {
-        this.mContext = new WeakReference<>(mContext);
+    public DownloadSongTask() {
+
     }
 
-    @Override
-    protected File doInBackground(String... strings) {
+    public File downloadFile(String... strings) throws IOException {
         PostsCache postsCache = PostsCache.getInstance();
         if (postsCache.isCached(strings[1]))
             return postsCache.getSong(strings[1]);
         try {
-
             FTPClient client = FtpClient.getInstance().getConnection();
             final String localDirectory = strings[1];
             final String remoteDirectory = strings[0];
@@ -49,22 +41,6 @@ public class DownloadSongTask extends AsyncTask<String, Void, File> {
         } catch (ExecutionException | InterruptedException | IOException e) {
             e.printStackTrace();
         }
-        return null;
-    }
-
-    @Override
-    protected void onPostExecute(File file) {
-        super.onPostExecute(file);
-        Context context = mContext.get();
-        if (context != null && file != null) {
-            PostsCache postsCache = PostsCache.getInstance();
-            postsCache.cacheSong(file.getAbsolutePath(), file);
-            Intent intent = new Intent(context, MusicService.class);
-            intent.putExtra("ACTION_CMD", MusicService.MUSIC_START);
-            intent.putExtra("SONG", file);
-            context.startService(intent);
-        }
-
-
+        throw new IOException("File Couldn't be downloaded!");
     }
 }

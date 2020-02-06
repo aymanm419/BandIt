@@ -3,6 +3,9 @@ package my.bandit.Repository;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
+import java.lang.ref.WeakReference;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -17,9 +20,11 @@ import my.bandit.ViewModel.PostsViewModel;
 
 public class PostsLoader extends AsyncTask<Void, Void, ArrayList<Post>> {
     private PostsViewModel postsViewModel;
+    private WeakReference<SwipeRefreshLayout> swipeRefreshLayoutRef;
 
-    public PostsLoader(PostsViewModel postsViewModel) {
+    public PostsLoader(PostsViewModel postsViewModel, SwipeRefreshLayout swipeRefreshLayout) {
         this.postsViewModel = postsViewModel;
+        this.swipeRefreshLayoutRef = new WeakReference<>(swipeRefreshLayout);
     }
 
     public ArrayList<Post> LoadPosts() throws ExecutionException, InterruptedException, SQLException {
@@ -59,5 +64,8 @@ public class PostsLoader extends AsyncTask<Void, Void, ArrayList<Post>> {
     protected void onPostExecute(ArrayList<Post> posts) {
         super.onPostExecute(posts);
         postsViewModel.getPosts().postValue(posts);
+        SwipeRefreshLayout swipeRefreshLayout = swipeRefreshLayoutRef.get();
+        if (swipeRefreshLayout != null)
+            swipeRefreshLayout.setRefreshing(false);
     }
 }
