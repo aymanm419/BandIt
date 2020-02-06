@@ -100,22 +100,24 @@ public class LoginActivity extends AppCompatActivity {
         LogUser(username, password);
         if (rememberMe.isChecked() && loginViewModel.getLoginResult().getValue().getSuccess()) {
             Log.i("Login", "Saving login data");
-            SharedPreferences savedData = this.getPreferences(Context.MODE_PRIVATE);
+            SharedPreferences savedData = getSharedPreferences("Login data",Context.MODE_PRIVATE);
             savedData.edit().putString("Username", username).apply();
             savedData.edit().putString("Password", password).apply();
         }
     }
 
     private void attemptRemember() {
-        SharedPreferences savedData = this.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences savedData = getSharedPreferences("Login data",Context.MODE_PRIVATE);
         Log.i("Login", "Attempting to get saved data");
         username = savedData.getString("Username", "");
         password = savedData.getString("Password", "");
+        if (username.isEmpty() || password.isEmpty())
+            return;
+        Log.i("Login", "Fetched " + username);
         LogUser(username, password);
     }
 
     private void updateUiWithUser() {
-
         Intent mainAct = new Intent(getApplicationContext(), MainActivity.class);
         Toast.makeText(getApplicationContext(), "Welcome, " + username, Toast.LENGTH_LONG).show();
         startActivity(mainAct);

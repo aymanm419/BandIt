@@ -6,29 +6,29 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 import my.bandit.Model.Post;
+import my.bandit.Repository.PostsLoader2;
+import my.bandit.data.LoginDataSource;
+import my.bandit.data.LoginRepository;
+import my.bandit.data.model.LoggedInUser;
 
 public class FavouriteViewModel extends ViewModel {
     private MutableLiveData<ArrayList<Post>> posts = new MutableLiveData<>();
+    private LoggedInUser user = LoginRepository.getInstance(new LoginDataSource()).getUser();
 
-    public MutableLiveData<ArrayList<Post>> fetchPosts() {
+    public void fetchPosts() {
         Log.i("Database", "Fetching favourite posts");
-        //TODO fetch user info from database
-        return null;
+        posts.setValue(new ArrayList<>());
+        try {
+            posts.setValue(new PostsLoader2().execute(user.getFavourites()).get());
+        } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public MutableLiveData<ArrayList<Post>> getPosts() {
         return posts;
-    }
-
-    public void addFav(Post post) {
-        Log.i ("Favourite", "Adding new favourite");
-        posts.getValue().add(post);
-    }
-
-    public void removeFav(Post post) {
-        Log.i ("Favourite", "Removing favourite");
-        posts.getValue().remove(post);
     }
 }

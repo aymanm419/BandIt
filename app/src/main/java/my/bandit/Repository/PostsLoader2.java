@@ -15,14 +15,10 @@ import my.bandit.Model.Post;
 import my.bandit.Model.Song;
 import my.bandit.ViewModel.PostsViewModel;
 
-public class PostsLoader extends AsyncTask<Void, Void, ArrayList<Post>> {
-    private PostsViewModel postsViewModel;
+// الإسم دا عقابا للهبد ف ال "single responsibility" بتاع ال تاني
+public class PostsLoader2 extends AsyncTask<ArrayList<Integer>, Void, ArrayList<Post>> {
 
-    public PostsLoader(PostsViewModel postsViewModel) {
-        this.postsViewModel = postsViewModel;
-    }
-
-    public ArrayList<Post> LoadPosts() throws ExecutionException, InterruptedException, SQLException {
+    private ArrayList<Post> LoadPosts(ArrayList<Integer> favourites) throws ExecutionException, InterruptedException, SQLException {
         DatabaseConnection databaseConnection = DatabaseConnection.getInstance();
         Connection connection = databaseConnection.getConnection();
         if (connection == null) {
@@ -30,7 +26,13 @@ public class PostsLoader extends AsyncTask<Void, Void, ArrayList<Post>> {
             return new ArrayList<>();
         }
         Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery("select * from posts");
+        StringBuilder query = new StringBuilder("select * from posts WHERE ");
+        for (int i = 0; i < favourites.size() - 1; i++) {
+            query.append("post_id = ").append(favourites.get(i)).append(" OR ");
+        }
+        query.append("post_id = ").append(favourites.get(favourites.size() - 1));
+        Log.i("Database Connection", "Attempting " + query.toString());
+        ResultSet resultSet = statement.executeQuery(query.toString());
         ArrayList<Post> postsLoaded = new ArrayList<>();
         while (resultSet.next()) {
             Song song = new Song(resultSet.getString("post_song_name"),
@@ -46,18 +48,16 @@ public class PostsLoader extends AsyncTask<Void, Void, ArrayList<Post>> {
     }
 
     @Override
-    protected ArrayList<Post> doInBackground(Void... voids) {
+    protected ArrayList<Post> doInBackground(ArrayList<Integer>... arrayLists) {
+        if (arrayLists[0].isEmpty()) {
+            Log.d("Favourites", "Favourites are empty");
+            return new ArrayList<>();
+        }
         try {
-            return LoadPosts();
+            return LoadPosts(arrayLists[0]);
         } catch (ExecutionException | InterruptedException | SQLException e) {
             e.printStackTrace();
         }
-        return null;
-    }
-
-    @Override
-    protected void onPostExecute(ArrayList<Post> posts) {
-        super.onPostExecute(posts);
-        postsViewModel.getPosts().postValue(posts);
+        return new ArrayList<>();
     }
 }

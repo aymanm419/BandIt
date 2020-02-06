@@ -2,6 +2,7 @@ package my.bandit.data;
 
 import java.util.concurrent.ExecutionException;
 
+import lombok.Getter;
 import my.bandit.Repository.AccountRegister;
 import my.bandit.data.model.LoggedInUser;
 
@@ -17,6 +18,7 @@ public class LoginRepository {
 
     // If user credentials will be cached in local storage, it is recommended it be encrypted
     // @see https://developer.android.com/training/articles/keystore
+    @Getter
     private LoggedInUser user = null;
 
     // private constructor : singleton access

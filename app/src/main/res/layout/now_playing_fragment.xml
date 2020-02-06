@@ -67,8 +67,8 @@
 
         <ImageView
             android:id="@+id/PostLikeImage"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
+            android:layout_width="36dp"
+            android:layout_height="38dp"
             android:layout_marginStart="310dp"
             android:layout_marginTop="120dp"
             app:srcCompat="@drawable/android_like_image" />

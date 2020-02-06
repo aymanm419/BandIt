@@ -30,7 +30,7 @@ public class AccountVerifier extends AsyncTask<String, String, Boolean> {
                 success = false;
             }
         }
-        if (resultSet.getRow() == 0)
+        if (resultSet.getRow() == 1)
             Log.d("Login", "Username not found");
         resultSet.close();
         databaseConnection.releaseConnection(connection);

@@ -24,6 +24,7 @@ public class AccountLoader extends AsyncTask<String, String, LoggedInUser> {
         Log.d("Login", "Fetching likes");
         ResultSet resultSet = statement.executeQuery("select * from likes where ID = " + user.getUserId());
         while (resultSet.next()) {
+            Log.d("Login", "Added " + resultSet.getInt("postID"));
             like.add(resultSet.getInt("postID"));
         }
         Log.d("Login", "Fetching dislikes");
@@ -49,6 +50,7 @@ public class AccountLoader extends AsyncTask<String, String, LoggedInUser> {
         ResultSet resultSet = statement.executeQuery("select * from accounts where username='" + username + "'");
         int id = 0;
         while (resultSet.next()) {
+            Log.i("Login", "Found id " + resultSet.getInt("ID"));
             id = resultSet.getInt("ID");
         }
         user = new LoggedInUser(id, username);
