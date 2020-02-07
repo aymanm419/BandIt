@@ -99,7 +99,6 @@ public class Home extends Fragment {
                     continueTimer();
                 } catch (IOException e) {
                     e.printStackTrace();
-                    Toast.makeText(view.getContext(), "Couldn't download songs!", Toast.LENGTH_SHORT).show();
                 }
             };
             pool.execute(runnable);

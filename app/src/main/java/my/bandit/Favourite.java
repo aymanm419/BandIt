@@ -45,9 +45,9 @@ public class Favourite extends Fragment {
         postsView = getView().findViewById(R.id.favList);
         posts = mViewModel.getPosts().getValue();
         postsAdaper = new PostsAdapter(getContext(), posts, post -> {
-            DownloadSongTask downloadSongTask = new DownloadSongTask(getContext());
-            downloadSongTask.execute(post.getSong().getSongFileDir(),
-                    getView().getContext().getFilesDir() + post.getSong().getSongName());
+            DownloadSongTask downloadSongTask = new DownloadSongTask();
+           //downloadSongTask.execute(post.getSong().getSongFileDir(),
+             //       getView().getContext().getFilesDir() + post.getSong().getSongName());
             PostsCache.getInstance().setLastPlayed(post);
         });
         mViewModel.getPosts().observe(getViewLifecycleOwner(), updatedList -> {

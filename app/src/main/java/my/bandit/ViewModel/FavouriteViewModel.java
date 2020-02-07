@@ -21,11 +21,7 @@ public class FavouriteViewModel extends ViewModel {
     public void fetchPosts() {
         Log.i("Database", "Fetching favourite posts");
         posts.setValue(new ArrayList<>());
-        try {
-            posts.setValue(new PostsLoader2().execute(user.getFavourites()).get());
-        } catch (ExecutionException | InterruptedException e) {
-            e.printStackTrace();
-        }
+        new PostsLoader2(this).execute(user.getFavourites());
     }
 
     public MutableLiveData<ArrayList<Post>> getPosts() {

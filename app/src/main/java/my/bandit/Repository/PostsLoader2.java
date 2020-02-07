@@ -13,10 +13,18 @@ import java.util.concurrent.ExecutionException;
 import my.bandit.Database.DatabaseConnection;
 import my.bandit.Model.Post;
 import my.bandit.Model.Song;
-import my.bandit.ViewModel.PostsViewModel;
+import my.bandit.ViewModel.FavouriteViewModel;
 
 // الإسم دا عقابا للهبد ف ال "single responsibility" بتاع ال تاني
 public class PostsLoader2 extends AsyncTask<ArrayList<Integer>, Void, ArrayList<Post>> {
+
+    private FavouriteViewModel postsViewModel;
+    //private WeakReference<SwipeRefreshLayout> swipeRefreshLayoutRef;
+
+    public PostsLoader2(FavouriteViewModel postsViewModel) {
+        this.postsViewModel = postsViewModel;
+        //this.swipeRefreshLayoutRef = new WeakReference<>(swipeRefreshLayout);
+    }
 
     private ArrayList<Post> LoadPosts(ArrayList<Integer> favourites) throws ExecutionException, InterruptedException, SQLException {
         DatabaseConnection databaseConnection = DatabaseConnection.getInstance();
@@ -59,5 +67,14 @@ public class PostsLoader2 extends AsyncTask<ArrayList<Integer>, Void, ArrayList<
             e.printStackTrace();
         }
         return new ArrayList<>();
+    }
+
+    @Override
+    protected void onPostExecute(ArrayList<Post> posts) {
+        super.onPostExecute(posts);
+        postsViewModel.getPosts().postValue(posts);
+        /*SwipeRefreshLayout swipeRefreshLayout = swipeRefreshLayoutRef.get();
+        if (swipeRefreshLayout != null)
+            swipeRefreshLayout.setRefreshing(false);*/
     }
 }
