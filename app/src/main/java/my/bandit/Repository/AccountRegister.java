@@ -8,7 +8,6 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.concurrent.ExecutionException;
 
 import my.bandit.Database.DatabaseConnection;
 import my.bandit.data.Result;
@@ -24,7 +23,7 @@ public class AccountRegister extends AsyncTask<String, String, Result> {
         statement.execute("INSERT INTO accounts(ID, username, password) VALUES (NULL, '" + username + "','" + password + "')");
     }
 
-    private boolean checkIfUserExists(String username) throws SQLException, ExecutionException, InterruptedException {
+    private boolean checkIfUserExists(String username) throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException {
         connection = databaseConnection.getConnection();
         if (connection == null) {
             Log.d("Database Connection", "Can not connect to db.");
@@ -48,7 +47,7 @@ public class AccountRegister extends AsyncTask<String, String, Result> {
                 databaseConnection.releaseConnection(connection);
                 return new Result.Error(new Exception("User already exists"));
             }
-        } catch (SQLException | InterruptedException | ExecutionException e) {
+        } catch (SQLException | InstantiationException | IllegalAccessException | ClassNotFoundException e) {
             return new Result.Error(new IOException("Error registering", e));
         }
     }

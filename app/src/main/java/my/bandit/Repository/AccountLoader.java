@@ -8,7 +8,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
 
 import my.bandit.Database.DatabaseConnection;
 import my.bandit.data.model.LoggedInUser;
@@ -39,7 +38,7 @@ public class AccountLoader extends AsyncTask<String, String, LoggedInUser> {
         }
     }
 
-    private LoggedInUser getUserData(String username) throws ExecutionException, InterruptedException, SQLException {
+    private LoggedInUser getUserData(String username) throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException {
         DatabaseConnection databaseConnection = DatabaseConnection.getInstance();
         Connection connection = databaseConnection.getConnection();
         if (connection == null) {
@@ -67,7 +66,7 @@ public class AccountLoader extends AsyncTask<String, String, LoggedInUser> {
     protected LoggedInUser doInBackground(String... strings) {
         try {
             return getUserData(strings[0]);
-        } catch (ExecutionException | InterruptedException | SQLException e) {
+        } catch (SQLException | InstantiationException | IllegalAccessException | ClassNotFoundException e) {
             e.printStackTrace();
         }
         return null;

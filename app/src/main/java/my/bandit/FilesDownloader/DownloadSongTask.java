@@ -21,8 +21,8 @@ public class DownloadSongTask {
 
     public File downloadFile(String... strings) throws IOException {
         PostsCache postsCache = PostsCache.getInstance();
-        if (postsCache.isCached(strings[1]))
-            return postsCache.getSong(strings[1]);
+        if (postsCache.isCached(strings[0]))
+            return postsCache.getSong(strings[0]);
         try {
             FTPClient client = FtpClient.getInstance().getConnection();
             final String localDirectory = strings[1];

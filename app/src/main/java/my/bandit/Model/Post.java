@@ -10,7 +10,6 @@ public class Post {
     private String pictureDir;
     @Getter @Setter
     private int postID;
-
     public Post(Song song, String pictureDir) {
         this.song = song;
         this.pictureDir = pictureDir;
