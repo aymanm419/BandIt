@@ -8,7 +8,6 @@ public class Post {
     @Getter
     private String pictureDir;
     private int postID;
-
     public Post(Song song, String pictureDir) {
         this.song = song;
         this.pictureDir = pictureDir;

@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -30,36 +31,45 @@ import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import my.bandit.FilesDownloader.DownloadImageTask;
 import my.bandit.FilesDownloader.DownloadSongTask;
 import my.bandit.Model.Post;
 import my.bandit.Repository.PostsLoader;
 import my.bandit.Service.MusicService;
 import my.bandit.ViewAdapter.PostsAdapter;
-import my.bandit.ViewModel.PostsViewModel;
+import my.bandit.ViewModel.HomeViewModel;
 
 public class Home extends Fragment {
 
-    private PostsViewModel mViewModel;
+    private HomeViewModel homeViewModel;
+
     private ArrayList<Post> posts;
-    private PostsAdapter postsAdaper;
+    private PostsAdapter postsAdapter;
+
     private RecyclerView postsView;
-    final private ExecutorService pool = Executors.newCachedThreadPool();
-    public static Home home;
     private SeekBar seekBar;
     private ImageView stateImage;
+    private ImageView currentSongImage;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private TextView songName, bandName;
+
     private MusicService musicService;
+
+    final private ExecutorService pool = Executors.newCachedThreadPool();
+
+    public static Home home;
+
     private Handler handler;
     private boolean mBound;
     private boolean timerRunning;
     private Runnable updateSeekBar;
     private ServiceConnection connection = new ServiceConnection() {
-
         @Override
         public void onServiceConnected(ComponentName className,
                                        IBinder service) {
             MusicService.LocalBinder binder = (MusicService.LocalBinder) service;
             musicService = binder.getService();
+            musicService.setHomeViewModel(homeViewModel);
             mBound = true;
         }
 
@@ -75,26 +85,36 @@ public class Home extends Fragment {
         return home;
     }
 
-    private void startSong(final View view, final File song) {
-        Intent intent = new Intent(view.getContext(), MusicService.class);
-        intent.putExtra("ACTION_CMD", MusicService.MUSIC_START);
-        intent.putExtra("SONG", song);
-        view.getContext().startService(intent);
+    private void startSong(final View view, final File song) throws IOException {
+        musicService.setDataSource(song);
+        musicService.preparePlayer();
+        homeViewModel.getPlayingState().postValue(true);
     }
 
     private void InitPostsView(final View view) {
-        posts = new ArrayList<>();
-        postsAdaper = new PostsAdapter(getContext(), posts, post -> {
+        postsAdapter = new PostsAdapter(getContext(), posts, post -> {
+            homeViewModel.getCurrentlyPlayedPost().setValue(post);
+        });
+        homeViewModel.getPosts().observe(getViewLifecycleOwner(), updatedList -> {
+            postsAdapter.setPosts(updatedList);
+            postsAdapter.notifyDataSetChanged();
+        });
+        homeViewModel.getSongDuration().observe(getViewLifecycleOwner(), integer -> {
+            seekBar.setMax(integer);
+        });
+        homeViewModel.getCurrentlyPlayedPost().observe(getViewLifecycleOwner(), post -> {
             PostsCache.getInstance().setLastPlayed(post);
-            Glide.with(view).load(R.drawable.ic_play_arrow_black_24dp).into(stateImage);
-            stateImage.setTag("playing");
+            new DownloadImageTask(view.getContext(), currentSongImage).execute(post.getPictureDir(),
+                    view.getContext().getFilesDir() + post.getSong().getBandName());
+            songName.setText(post.getSong().getSongName());
+            bandName.setText(post.getSong().getBandName());
             Runnable runnable = () -> {
                 DownloadSongTask downloadSongTask = new DownloadSongTask();
                 try {
                     File file = downloadSongTask.downloadFile(post.getSong().getSongFileDir(),
                             view.getContext().getFilesDir() + post.getSong().getSongName());
                     PostsCache postsCache = PostsCache.getInstance();
-                    postsCache.cacheSong(file.getAbsolutePath(), file);
+                    postsCache.cacheSong(post.getSong().getSongFileDir(), file);
                     startSong(view, file);
                     continueTimer();
                 } catch (IOException e) {
@@ -104,13 +124,8 @@ public class Home extends Fragment {
             };
             pool.execute(runnable);
         });
-        mViewModel = new ViewModelProvider(this).get(PostsViewModel.class);
-        mViewModel.getPosts().observe(getViewLifecycleOwner(), updatedList -> {
-            postsAdaper.setPosts(updatedList);
-            postsAdaper.notifyDataSetChanged();
-        });
         postsView.setLayoutManager(new LinearLayoutManager(view.getContext()));
-        postsView.setAdapter(postsAdaper);
+        postsView.setAdapter(postsAdapter);
     }
 
     private void AttachViews(final View view) {
@@ -118,24 +133,33 @@ public class Home extends Fragment {
         seekBar = view.findViewById(R.id.seekBar);
         stateImage = view.findViewById(R.id.stateImage);
         swipeRefreshLayout = view.findViewById(R.id.swiperefresh);
+        currentSongImage = view.findViewById(R.id.currentPlayingImage);
+        songName = view.findViewById(R.id.currentPlayingSong);
+        bandName = view.findViewById(R.id.currentPlayingBand);
     }
 
     private void attachViewListeners(final View view) {
         stateImage.setOnClickListener(v -> {
-            if (stateImage.getTag().toString().equals("playing")) {
-                Glide.with(view).load(R.drawable.ic_pause_black_24dp).into(stateImage);
-                musicService.getMusicHandler().stopPlaying();
-                stateImage.setTag("stopped");
+            boolean currentValue = homeViewModel.getPlayingState().getValue();
+            homeViewModel.getPlayingState().setValue(!currentValue);
+        });
+
+        homeViewModel.getPlayingState().observe(getViewLifecycleOwner(), aBoolean -> {
+            if (aBoolean) {
+                Glide.with(view.getContext()).load(R.drawable.ic_play_arrow_black_24dp).into(stateImage);
+                if (mBound)
+                    musicService.continuePlaying();
             } else {
-                Glide.with(view).load(R.drawable.ic_play_arrow_black_24dp).into(stateImage);
-                musicService.getMusicHandler().continuePlaying();
-                stateImage.setTag("playing");
+                Glide.with(view.getContext()).load(R.drawable.ic_pause_black_24dp).into(stateImage);
+                if (mBound)
+                    musicService.pausePlaying();
             }
         });
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-
+                if (fromUser && !musicService.getMediaPlayer().isPlaying())
+                    musicService.continuePlaying();
             }
 
             @Override
@@ -146,12 +170,12 @@ public class Home extends Fragment {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 continueTimer();
-                if (musicService.getMusicHandler().isTimerRunning())
-                    musicService.getMusicHandler().seek(seekBar.getProgress());
+                if (musicService.isPrepared())
+                    musicService.seek(seekBar.getProgress());
             }
         });
         swipeRefreshLayout.setOnRefreshListener(() -> {
-            PostsLoader postsLoader = new PostsLoader(mViewModel, swipeRefreshLayout);
+            PostsLoader postsLoader = new PostsLoader(homeViewModel, swipeRefreshLayout, view.getContext());
             postsLoader.execute();
         });
     }
@@ -166,9 +190,7 @@ public class Home extends Fragment {
 
     private void updateSeekBar() {
         if (mBound && timerRunning) {
-            if (musicService.getMusicHandler().isTimerRunning()) {
-                if (seekBar.getMax() != musicService.getMusicHandler().getMax())
-                    seekBar.setMax(musicService.getMediaPlayer().getDuration());
+            if (musicService.isPrepared()) {
                 seekBar.setProgress(musicService.getMediaPlayer().getCurrentPosition());
             }
         }
@@ -179,7 +201,10 @@ public class Home extends Fragment {
         continueTimer();
         updateSeekBar = this::updateSeekBar;
         handler = new Handler();
+        posts = new ArrayList<>();
+        homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
     }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -208,7 +233,6 @@ public class Home extends Fragment {
         Intent intent = new Intent(getActivity().getApplicationContext(), MusicService.class);
         getView().getContext().startService(intent);
         getView().getContext().bindService(intent, connection, Context.BIND_AUTO_CREATE);
-
 
     }
 
