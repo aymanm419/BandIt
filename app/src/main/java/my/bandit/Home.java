@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -28,6 +27,7 @@ import com.bumptech.glide.Glide;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -48,7 +48,7 @@ public class Home extends Fragment {
 
     private RecyclerView postsView;
     private SeekBar seekBar;
-    private ImageView stateImage;
+    private ImageView stateImage, previousImage, nextImage;
     private ImageView currentSongImage;
     private SwipeRefreshLayout swipeRefreshLayout;
     private TextView songName, bandName;
@@ -91,10 +91,7 @@ public class Home extends Fragment {
         homeViewModel.getPlayingState().postValue(true);
     }
 
-    private void InitPostsView(final View view) {
-        postsAdapter = new PostsAdapter(getContext(), posts, post -> {
-            homeViewModel.getCurrentlyPlayedPost().setValue(post);
-        });
+    private void InitObservers(final View view) {
         homeViewModel.getPosts().observe(getViewLifecycleOwner(), updatedList -> {
             postsAdapter.setPosts(updatedList);
             postsAdapter.notifyDataSetChanged();
@@ -123,8 +120,18 @@ public class Home extends Fragment {
             };
             pool.execute(runnable);
         });
-        postsView.setLayoutManager(new LinearLayoutManager(view.getContext()));
-        postsView.setAdapter(postsAdapter);
+        homeViewModel.getPlayingState().observe(getViewLifecycleOwner(), aBoolean -> {
+            if (aBoolean) {
+                Glide.with(view.getContext()).load(R.drawable.ic_play_arrow_black_24dp).into(stateImage);
+                if (mBound)
+                    musicService.continuePlaying();
+            } else {
+                Glide.with(view.getContext()).load(R.drawable.ic_pause_black_24dp).into(stateImage);
+                if (mBound)
+                    musicService.pausePlaying();
+            }
+        });
+
     }
 
     private void AttachViews(final View view) {
@@ -135,6 +142,8 @@ public class Home extends Fragment {
         currentSongImage = view.findViewById(R.id.currentPlayingImage);
         songName = view.findViewById(R.id.currentPlayingSong);
         bandName = view.findViewById(R.id.currentPlayingBand);
+        previousImage = view.findViewById(R.id.previousImage);
+        nextImage = view.findViewById(R.id.nextImage);
     }
 
     private void attachViewListeners(final View view) {
@@ -142,16 +151,23 @@ public class Home extends Fragment {
             boolean currentValue = homeViewModel.getPlayingState().getValue();
             homeViewModel.getPlayingState().setValue(!currentValue);
         });
-
-        homeViewModel.getPlayingState().observe(getViewLifecycleOwner(), aBoolean -> {
-            if (aBoolean) {
-                Glide.with(view.getContext()).load(R.drawable.ic_play_arrow_black_24dp).into(stateImage);
-                if (mBound)
-                    musicService.continuePlaying();
-            } else {
-                Glide.with(view.getContext()).load(R.drawable.ic_pause_black_24dp).into(stateImage);
-                if (mBound)
-                    musicService.pausePlaying();
+        previousImage.setOnClickListener(v -> {
+            if (homeViewModel.getCurrentlyPlayedPostIndex().getValue() != null
+                    && homeViewModel.getPosts().getValue() != null) {
+                int currentPost = homeViewModel.getCurrentlyPlayedPostIndex().getValue();
+                if (currentPost > 0)
+                    currentPost--;
+                homeViewModel.getCurrentlyPlayedPost().setValue(homeViewModel.getPosts().getValue().get(currentPost));
+            }
+        });
+        nextImage.setOnClickListener(v -> {
+            if (homeViewModel.getCurrentlyPlayedPostIndex().getValue() != null
+                    && homeViewModel.getPosts().getValue() != null) {
+                int currentPost = homeViewModel.getCurrentlyPlayedPostIndex().getValue();
+                List<Post> list = homeViewModel.getPosts().getValue();
+                if (currentPost + 1 < list.size())
+                    currentPost++;
+                homeViewModel.getCurrentlyPlayedPost().setValue(list.get(currentPost));
             }
         });
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -202,6 +218,12 @@ public class Home extends Fragment {
         handler = new Handler();
         posts = new ArrayList<>();
         homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
+        postsAdapter = new PostsAdapter(getContext(), posts, (post, position) -> {
+            homeViewModel.getCurrentlyPlayedPost().setValue(post);
+            homeViewModel.getCurrentlyPlayedPostIndex().setValue(position);
+        });
+        postsView.setLayoutManager(new LinearLayoutManager(getContext()));
+        postsView.setAdapter(postsAdapter);
     }
 
     @Override
@@ -224,9 +246,10 @@ public class Home extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        initVariables();
         AttachViews(getView());
-        InitPostsView(getView());
+        initVariables();
+
+        InitObservers(getView());
         attachViewListeners(getView());
         updateSeekBar();
         Intent intent = new Intent(getActivity().getApplicationContext(), MusicService.class);

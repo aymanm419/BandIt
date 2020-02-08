@@ -8,7 +8,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
 
 import my.bandit.Database.DatabaseConnection;
 import my.bandit.Model.Post;
@@ -26,9 +25,14 @@ public class PostsLoader2 extends AsyncTask<ArrayList<Integer>, Void, ArrayList<
         //this.swipeRefreshLayoutRef = new WeakReference<>(swipeRefreshLayout);
     }
 
-    private ArrayList<Post> LoadPosts(ArrayList<Integer> favourites) throws ExecutionException, InterruptedException, SQLException {
+    private ArrayList<Post> LoadPosts(ArrayList<Integer> favourites) throws SQLException {
         DatabaseConnection databaseConnection = DatabaseConnection.getInstance();
-        Connection connection = databaseConnection.getConnection();
+        Connection connection = null;
+        try {
+            connection = databaseConnection.getConnection();
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
         if (connection == null) {
             Log.d("Database Connection", "Can not connect to db.");
             return new ArrayList<>();
@@ -63,7 +67,7 @@ public class PostsLoader2 extends AsyncTask<ArrayList<Integer>, Void, ArrayList<
         }
         try {
             return LoadPosts(arrayLists[0]);
-        } catch (ExecutionException | InterruptedException | SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return new ArrayList<>();

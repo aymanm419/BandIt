@@ -6,15 +6,19 @@ import android.util.Log;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.concurrent.ExecutionException;
 
 import my.bandit.Database.DatabaseConnection;
 
 public class UpdateFavourite extends AsyncTask<Integer, Integer, Void> {
 
-    private void favouritePost(int userID, int postID, int change) throws SQLException, ExecutionException, InterruptedException {
+    private void favouritePost(int userID, int postID, int change) throws SQLException {
         DatabaseConnection databaseConnection = DatabaseConnection.getInstance();
-        Connection connection = databaseConnection.getConnection();
+        Connection connection = null;
+        try {
+            connection = databaseConnection.getConnection();
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
         if (connection == null) {
             Log.d("Database Connection", "Can not connect to db.");
             return;
@@ -32,7 +36,7 @@ public class UpdateFavourite extends AsyncTask<Integer, Integer, Void> {
     protected Void doInBackground(Integer... integers) {
         try {
             favouritePost(integers[0], integers[1], integers[2]);
-        } catch (SQLException | InterruptedException | ExecutionException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return null;

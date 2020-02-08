@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -44,7 +43,7 @@ public class Favourite extends Fragment {
         mViewModel.fetchPosts();
         postsView = getView().findViewById(R.id.favList);
         posts = mViewModel.getPosts().getValue();
-        postsAdaper = new PostsAdapter(getContext(), posts, post -> {
+        postsAdaper = new PostsAdapter(getContext(), posts, (post, integer) -> {
             DownloadSongTask downloadSongTask = new DownloadSongTask();
            //downloadSongTask.execute(post.getSong().getSongFileDir(),
              //       getView().getContext().getFilesDir() + post.getSong().getSongName());

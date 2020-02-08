@@ -15,6 +15,8 @@ public class HomeViewModel extends AndroidViewModel {
     @Getter
     private MutableLiveData<Post> currentlyPlayedPost;
     @Getter
+    private MutableLiveData<Integer> currentlyPlayedPostIndex;
+    @Getter
     private MutableLiveData<Boolean> playingState;
     @Getter
     private MutableLiveData<ArrayList<Post>> posts;
@@ -24,6 +26,7 @@ public class HomeViewModel extends AndroidViewModel {
     public HomeViewModel(@NonNull Application application) {
         super(application);
         currentlyPlayedPost = new MutableLiveData<>();
+        currentlyPlayedPostIndex = new MutableLiveData<>();
         playingState = new MutableLiveData<>();
         posts = new MutableLiveData<>();
         songDuration = new MutableLiveData<>();
