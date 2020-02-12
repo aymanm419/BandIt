@@ -1,5 +1,7 @@
 package my.bandit;
 
+import android.util.Log;
+
 import java.io.File;
 import java.util.HashMap;
 
@@ -33,11 +35,16 @@ public class PostsCache {
         if (isCached(fileDir))
             return;
         cache.put(fileDir, file);
+        Log.i("Cache Information", "Cached file with directory = " + fileDir);
     }
 
     public File getSong(String fileDir) {
-        if (isCached(fileDir))
+        Log.i("Cache Request", "Asking for file at = " + fileDir);
+        if (isCached(fileDir)) {
+            Log.i("Cache Request", "Item requested feteched");
             return cache.get(fileDir);
+        }
+        Log.i("Cache Request", "Item was not found");
         return null;
     }
 }

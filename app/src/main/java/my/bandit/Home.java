@@ -101,17 +101,14 @@ public class Home extends Fragment {
         });
         homeViewModel.getCurrentlyPlayedPost().observe(getViewLifecycleOwner(), post -> {
             PostsCache.getInstance().setLastPlayed(post);
-            new DownloadImageTask(view.getContext(), currentSongImage).execute(post.getPictureDir(),
-                    view.getContext().getFilesDir() + post.getSong().getBandName());
+            new DownloadImageTask(view.getContext().getFilesDir() + post.getSong().getBandName(),
+                    view.getContext(), currentSongImage).downloadFile(post.getPictureDir());
             songName.setText(post.getSong().getSongName());
             bandName.setText(post.getSong().getBandName());
             Runnable runnable = () -> {
-                DownloadSongTask downloadSongTask = new DownloadSongTask();
+                DownloadSongTask downloadSongTask = new DownloadSongTask(view.getContext().getFilesDir() + post.getSong().getSongName());
                 try {
-                    File file = downloadSongTask.downloadFile(post.getSong().getSongFileDir(),
-                            view.getContext().getFilesDir() + post.getSong().getSongName());
-                    PostsCache postsCache = PostsCache.getInstance();
-                    postsCache.cacheSong(post.getSong().getSongFileDir(), file);
+                    File file = downloadSongTask.downloadFile(post.getSong().getSongFileDir());
                     startSong(view, file);
                     continueTimer();
                 } catch (IOException e) {
@@ -191,7 +188,7 @@ public class Home extends Fragment {
         });
         swipeRefreshLayout.setOnRefreshListener(() -> {
             PostsLoader postsLoader = new PostsLoader(homeViewModel, swipeRefreshLayout, view.getContext());
-            postsLoader.execute();
+            postsLoader.loadPosts(1, 10);
         });
     }
 
@@ -248,7 +245,6 @@ public class Home extends Fragment {
         super.onActivityCreated(savedInstanceState);
         AttachViews(getView());
         initVariables();
-
         InitObservers(getView());
         attachViewListeners(getView());
         updateSeekBar();

@@ -39,8 +39,9 @@ public class PostsAdapter extends RecyclerView.Adapter<PostViewHolder> {
         final Post currentPost = posts.get(position);
         holder.getPostTextView().setText(currentPost.getSong().getSongName());
         holder.getPostAlbumTextView().setText(currentPost.getSong().getBandName());
-        DownloadImageTask downloadImageTask = new DownloadImageTask(mContext, holder.getAlbumPicture());
-        downloadImageTask.execute(currentPost.getPictureDir(), mContext.getFilesDir() + currentPost.getSong().getBandName());
+        DownloadImageTask downloadImageTask = new DownloadImageTask(mContext.getFilesDir() + currentPost.getSong().getBandName()
+                , mContext, holder.getAlbumPicture());
+        downloadImageTask.downloadFile(currentPost.getPictureDir());
         holder.getCardView().setOnClickListener(v -> {
             postClick.onClick(currentPost, position);
         });

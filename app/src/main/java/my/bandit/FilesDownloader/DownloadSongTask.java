@@ -2,45 +2,61 @@ package my.bandit.FilesDownloader;
 
 import android.util.Log;
 
-import org.apache.commons.net.ftp.FTPClient;
-
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.concurrent.ExecutionException;
 
+import my.bandit.Api.ApiHandler;
+import my.bandit.Api.ResponseHandler;
 import my.bandit.PostsCache;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Response;
 
 public class DownloadSongTask {
+    private String localDirectory;
 
-    public DownloadSongTask() {
+    public DownloadSongTask(String localDirectory) {
+        this.localDirectory = localDirectory;
 
     }
 
-    public File downloadFile(String... strings) throws IOException {
-        PostsCache postsCache = PostsCache.getInstance();
-        if (postsCache.isCached(strings[0]))
-            return postsCache.getSong(strings[0]);
-        try {
-            FTPClient client = FtpClient.getInstance().getConnection();
-            final String localDirectory = strings[1];
-            final String remoteDirectory = strings[0];
-            File downloadFile = new File(localDirectory);
-            OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(downloadFile));
-            Log.d("FTPClientTask", "Initiated Downloading.");
-            boolean success = client.retrieveFile(remoteDirectory, outputStream);
-            if (success)
-                Log.d("FTPClientTask", "Downloaded successfully!");
-            else
-                Log.d("FTPClientTask", "Download Failed!");
-            outputStream.close();
-            FtpClient.getInstance().releaseConnection(client);
-            return downloadFile;
-        } catch (ExecutionException | InterruptedException | IOException e) {
+    private File saveToDisk(ResponseBody responseBody) {
+        File destinationFile = new File(localDirectory);
+        try (InputStream inputStream = responseBody.byteStream();
+             OutputStream outputStream = new FileOutputStream(destinationFile)) {
+            Log.i("File Information", "File Size = " + responseBody.contentLength());
+            byte[] data = new byte[8192];
+            int count;
+            int progress = 0;
+            while ((count = inputStream.read(data)) != -1) {
+                outputStream.write(data, 0, count);
+                progress += count;
+                //Log.i("Download Information", "Progress: " + progress + "/" + responseBody.contentLength() + " >>>> " + (float) progress / responseBody.contentLength() * 100);
+            }
+            outputStream.flush();
+            Log.i("Download Information", "File saved successfully!");
+            return destinationFile;
+        } catch (IOException e) {
             e.printStackTrace();
         }
-        throw new IOException("File Couldn't be downloaded!");
+        return null;
+    }
+    public File downloadFile(String... strings) throws IOException {
+        final String remoteDirectory = strings[0];
+        final ApiHandler apiHandler = ApiHandler.getInstance();
+        PostsCache postsCache = PostsCache.getInstance();
+        if (postsCache.isCached(remoteDirectory))
+            return postsCache.getSong(remoteDirectory);
+        Call<ResponseBody> call = apiHandler.getDataApi().getImage(remoteDirectory);
+        Response<ResponseBody> response = call.execute();
+        if (ResponseHandler.validateResponse(response)) {
+            File file = saveToDisk(response.body());
+            postsCache.cacheSong(remoteDirectory, file);
+            return file;
+        }
+        return null;
     }
 }

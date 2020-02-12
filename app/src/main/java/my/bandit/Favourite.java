@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
-import my.bandit.FilesDownloader.DownloadSongTask;
 import my.bandit.Model.Post;
 import my.bandit.ViewAdapter.PostsAdapter;
 import my.bandit.ViewModel.FavouriteViewModel;
@@ -44,7 +43,7 @@ public class Favourite extends Fragment {
         postsView = getView().findViewById(R.id.favList);
         posts = mViewModel.getPosts().getValue();
         postsAdaper = new PostsAdapter(getContext(), posts, (post, integer) -> {
-            DownloadSongTask downloadSongTask = new DownloadSongTask();
+            //DownloadSongTask downloadSongTask = new DownloadSongTask();
            //downloadSongTask.execute(post.getSong().getSongFileDir(),
              //       getView().getContext().getFilesDir() + post.getSong().getSongName());
             PostsCache.getInstance().setLastPlayed(post);
