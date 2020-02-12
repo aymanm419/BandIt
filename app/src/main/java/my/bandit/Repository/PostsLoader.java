@@ -43,7 +43,7 @@ public class PostsLoader implements Callback<JsonObject> {
     }
 
     public void loadPosts(int startPost, int endPost) {
-        Call<JsonObject> call = ApiHandler.getInstance().getDataApi().getPosts(startPost, endPost);
+        Call<JsonObject> call = ApiHandler.getInstance().getFilesApi().getPosts(startPost, endPost);
         call.enqueue(this);
     }
 

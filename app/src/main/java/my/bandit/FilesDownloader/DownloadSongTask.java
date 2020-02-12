@@ -27,7 +27,7 @@ public class DownloadSongTask {
         File destinationFile = new File(localDirectory);
         try (InputStream inputStream = responseBody.byteStream();
              OutputStream outputStream = new FileOutputStream(destinationFile)) {
-            Log.i("File Information", "File Size = " + responseBody.contentLength());
+            Log.d("File Information", "File Size = " + responseBody.contentLength());
             byte[] data = new byte[8192];
             int count;
             int progress = 0;
@@ -37,7 +37,7 @@ public class DownloadSongTask {
                 //Log.i("Download Information", "Progress: " + progress + "/" + responseBody.contentLength() + " >>>> " + (float) progress / responseBody.contentLength() * 100);
             }
             outputStream.flush();
-            Log.i("Download Information", "File saved successfully!");
+            Log.d("Download Information", "File saved successfully!");
             return destinationFile;
         } catch (IOException e) {
             e.printStackTrace();
@@ -50,7 +50,7 @@ public class DownloadSongTask {
         PostsCache postsCache = PostsCache.getInstance();
         if (postsCache.isCached(remoteDirectory))
             return postsCache.getSong(remoteDirectory);
-        Call<ResponseBody> call = apiHandler.getDataApi().getImage(remoteDirectory);
+        Call<ResponseBody> call = apiHandler.getFilesApi().getFile(remoteDirectory);
         Response<ResponseBody> response = call.execute();
         if (ResponseHandler.validateResponse(response)) {
             File file = saveToDisk(response.body());

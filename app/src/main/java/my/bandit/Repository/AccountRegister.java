@@ -3,35 +3,34 @@ package my.bandit.Repository;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import com.google.gson.JsonObject;
 
-import my.bandit.Database.DatabaseConnection;
+import java.io.IOException;
+
+import my.bandit.Api.ApiHandler;
+import my.bandit.Api.ResponseHandler;
+import my.bandit.Api.UsersApi;
 import my.bandit.data.Result;
 import my.bandit.data.model.LoggedInUser;
+import retrofit2.Response;
 
 public class AccountRegister extends AsyncTask<String, String, Result> {
-    Connection connection;
-    DatabaseConnection databaseConnection = DatabaseConnection.getInstance();
 
-    private void createUser(String username, String password) throws SQLException {
-        Statement statement = connection.createStatement();
-        Log.d("Register", "Creating table entry" + "INSERT INTO accounts(ID, username, password) VALUES (NULL, '" + username + "','" + password + "')");
-        statement.execute("INSERT INTO accounts(ID, username, password) VALUES (NULL, '" + username + "','" + password + "')");
+    private void createUser(String username, String password) throws IOException {
+        UsersApi usersApi = ApiHandler.getInstance().getUsersApi();
+        Response<JsonObject> jsonResult = usersApi.createAccount(username, password).execute();
+        if (!ResponseHandler.validateJsonResponse(jsonResult))
+            return;
+        Log.i("Account Creation", jsonResult.body().get("message").toString());
     }
 
-    private boolean checkIfUserExists(String username) throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException {
-        connection = databaseConnection.getConnection();
-        if (connection == null) {
-            Log.d("Database Connection", "Can not connect to db.");
+    private boolean checkIfUserExists(String username) throws IOException {
+        UsersApi usersApi = ApiHandler.getInstance().getUsersApi();
+        Response<JsonObject> jsonResult = usersApi.isUserExists(username).execute();
+        if (!ResponseHandler.validateJsonResponse(jsonResult))
             return false;
-        }
-        Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery("select * from accounts where username='" + username + "'");
-        return resultSet.next();
+        Log.i("Account Check", jsonResult.body().get("message").toString());
+        return true;
     }
 
     @Override
@@ -40,14 +39,12 @@ public class AccountRegister extends AsyncTask<String, String, Result> {
             if (!checkIfUserExists(strings[0])) {
                 Log.i("Register", "Attempting to create user");
                 createUser(strings[0], strings[1]);
-                databaseConnection.releaseConnection(connection);
                 return new Result.Success<>(new LoggedInUser(0, ""));
             } else {
                 Log.i("Register", "Existing user");
-                databaseConnection.releaseConnection(connection);
                 return new Result.Error(new Exception("User already exists"));
             }
-        } catch (SQLException | InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+        } catch (IOException e) {
             return new Result.Error(new IOException("Error registering", e));
         }
     }

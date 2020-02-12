@@ -38,7 +38,7 @@ public class DownloadImageTask {
 
     public void downloadFile(String remoteDirectory) {
         final ApiHandler apiHandler = ApiHandler.getInstance();
-        Call<ResponseBody> call = apiHandler.getDataApi().getImage(remoteDirectory);
+        Call<ResponseBody> call = apiHandler.getFilesApi().getFile(remoteDirectory);
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -64,17 +64,17 @@ public class DownloadImageTask {
             File destinationFile = new File(localDirectory);
             try (InputStream inputStream = body.byteStream();
                  OutputStream outputStream = new FileOutputStream(destinationFile)) {
-                Log.i("File Information", "File Size = " + body.contentLength());
+                Log.d("File Information", "File Size = " + body.contentLength());
                 byte[] data = new byte[8192];
                 int count;
                 int progress = 0;
                 while ((count = inputStream.read(data)) != -1) {
                     outputStream.write(data, 0, count);
                     progress += count;
-                    Log.i(TAG, "Progress: " + progress + "/" + body.contentLength() + " >>>> " + (float) progress / body.contentLength() * 100);
+                    //Log.i(TAG, "Progress: " + progress + "/" + body.contentLength() + " >>>> " + (float) progress / body.contentLength() * 100);
                 }
                 outputStream.flush();
-                Log.i(TAG, "File saved successfully!");
+                Log.d(TAG, "File saved successfully!");
                 return destinationFile;
             } catch (IOException e) {
                 e.printStackTrace();

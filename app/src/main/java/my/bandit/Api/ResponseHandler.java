@@ -9,10 +9,10 @@ import retrofit2.Response;
 public class ResponseHandler {
     public static boolean validateResponse(Response<?> response) {
         if (response.body() == null) {
-            Log.i("HTTP Response", "Received Response with no body!");
+            Log.d("HTTP Response", "Received Response with no body!");
             return false;
         } else if (!response.isSuccessful()) {
-            Log.i("Api Server", "Did not receive a reply from api.");
+            Log.d("Api Server", "Did not receive a reply from api.");
             return false;
         }
         return true;
@@ -21,8 +21,8 @@ public class ResponseHandler {
     private static boolean validateJsonBody(Response<JsonObject> response) {
         StandardResponse standardResponse = ApiHandler.getInstance().getGson().fromJson(response.body(), StandardResponse.class);
         if (standardResponse.getStatus().equals(StatusResponse.ERROR)) {
-            Log.i("HTTP Response Body", "Received response with error status");
-            Log.i("HTTP Response Body", "Message details: " + standardResponse.getMessage());
+            Log.d("HTTP Response Body", "Received response with error status");
+            Log.d("HTTP Response Body", "Message details: " + standardResponse.getMessage());
             return false;
         }
         return true;

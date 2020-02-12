@@ -10,9 +10,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class ApiHandler {
     private static ApiHandler apiHandler;
     @Getter
-    private DataApi dataApi;
+    private FilesApi filesApi;
     @Getter
-    private Retrofit retrofit;
+    private UsersApi usersApi;
     @Getter
     private Gson gson;
 
@@ -21,12 +21,13 @@ public class ApiHandler {
                 .setLenient()
                 .create();
 
-        retrofit = new Retrofit.Builder()
+        Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://10.0.2.2:6969/")
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
 
-        dataApi = retrofit.create(DataApi.class);
+        filesApi = retrofit.create(FilesApi.class);
+        usersApi = retrofit.create(UsersApi.class);
     }
 
     public static ApiHandler getInstance() {

@@ -6,10 +6,8 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
 
 import my.bandit.Model.Post;
-import my.bandit.Repository.PostsLoader2;
 import my.bandit.data.LoginDataSource;
 import my.bandit.data.LoginRepository;
 import my.bandit.data.model.LoggedInUser;
@@ -21,7 +19,6 @@ public class FavouriteViewModel extends ViewModel {
     public void fetchPosts() {
         Log.i("Database", "Fetching favourite posts");
         posts.setValue(new ArrayList<>());
-        new PostsLoader2(this).execute(user.getFavourites());
     }
 
     public MutableLiveData<ArrayList<Post>> getPosts() {

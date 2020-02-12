@@ -3,38 +3,24 @@ package my.bandit.Repository;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import com.google.gson.JsonObject;
 
-import my.bandit.Database.DatabaseConnection;
+import java.io.IOException;
+
+import my.bandit.Api.ApiHandler;
+import my.bandit.Api.ResponseHandler;
+import my.bandit.Api.UsersApi;
+import retrofit2.Response;
 
 public class AccountVerifier extends AsyncTask<String, String, Boolean> {
 
-    private boolean verifyAccount(String username, String password) throws Exception {
-        DatabaseConnection databaseConnection = DatabaseConnection.getInstance();
-        Connection connection = databaseConnection.getConnection();
-        if (connection == null) {
-            Log.d("Database Connection", "Can not connect to db.");
+    private boolean verifyAccount(String username, String password) throws IOException {
+        UsersApi usersApi = ApiHandler.getInstance().getUsersApi();
+        Response<JsonObject> jsonResult = usersApi.validateUserCredentials(username, password).execute();
+        if (!ResponseHandler.validateJsonResponse(jsonResult))
             return false;
-        }
-        Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery("select * from accounts where username='" + username + "'");
-        boolean success = false;
-        while (resultSet.next()) {
-            if (resultSet.getString("password").equals(password)) {
-                Log.d("Login", "Successful authentication");
-                success = true;
-            } else {
-                Log.d("Login", "Invalid password");
-                success = false;
-            }
-        }
-        if (resultSet.getRow() == 1)
-            Log.d("Login", "Username not found");
-        resultSet.close();
-        databaseConnection.releaseConnection(connection);
-        return success;
+        Log.i("Account Validation", jsonResult.body().get("message").toString());
+        return true;
     }
 
     @Override
