@@ -1,64 +1,62 @@
 package my.bandit.Repository;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
+
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
-import my.bandit.Database.DatabaseConnection;
+import my.bandit.Api.ApiHandler;
+import my.bandit.Api.ResponseHandler;
+import my.bandit.Api.UsersApi;
 import my.bandit.data.model.LoggedInUser;
+import retrofit2.Response;
 
 public class AccountLoader extends AsyncTask<String, String, LoggedInUser> {
 
-    LoggedInUser user;
-    private ArrayList<Integer> favourites = new ArrayList<>();
-    private ArrayList<Integer> like = new ArrayList<>();
-    private ArrayList<Integer> dislike = new ArrayList<>();
-
-    private void fetchLists(Statement statement) throws SQLException {
-        Log.d("Login", "Fetching likes");
-        ResultSet resultSet = statement.executeQuery("select * from likes where ID = " + user.getUserId());
-        while (resultSet.next()) {
-            Log.d("Login", "Added " + resultSet.getInt("postID"));
-            like.add(resultSet.getInt("postID"));
-        }
-        Log.d("Login", "Fetching dislikes");
-        resultSet = statement.executeQuery("select * from dislikes where ID = " + user.getUserId());
-        while (resultSet.next()) {
-            dislike.add(resultSet.getInt("postID"));
-        }
-        Log.d("Login", "Fetching favourites");
-        resultSet = statement.executeQuery("select * from favourites where ID = " + user.getUserId());
-        while (resultSet.next()) {
-            favourites.add(resultSet.getInt("postID"));
-        }
+    private int getUserID(String userName) throws IOException {
+        UsersApi usersApi = ApiHandler.getInstance().getUsersApi();
+        Response<JsonObject> jsonResult = usersApi.getUserID(userName).execute();
+        if (!ResponseHandler.validateJsonResponse(jsonResult))
+            throw new RuntimeException("Error while receiving respond from API regarding user ID, userName " + userName);
+        return jsonResult.body().get("data").getAsInt();
     }
 
-    private LoggedInUser getUserData(String username) throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException {
-        DatabaseConnection databaseConnection = DatabaseConnection.getInstance();
-        Connection connection = databaseConnection.getConnection();
-        if (connection == null) {
-            Log.d("Database Connection", "Can not connect to db.");
-            return null;
-        }
-        Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery("select * from accounts where username='" + username + "'");
-        int id = 0;
-        while (resultSet.next()) {
-            Log.i("Login", "Found id " + resultSet.getInt("ID"));
-            id = resultSet.getInt("ID");
-        }
-        user = new LoggedInUser(id, username);
-        fetchLists(statement);
-        user.setDisliked(dislike);
-        user.setFavourites(favourites);
-        user.setLiked(like);
-        resultSet.close();
-        databaseConnection.releaseConnection(connection);
+    private ArrayList<Integer> getUserLikes(String userName) throws IOException {
+        UsersApi usersApi = ApiHandler.getInstance().getUsersApi();
+        Response<JsonObject> jsonResult = usersApi.getUserLikes(userName).execute();
+        if (!ResponseHandler.validateJsonResponse(jsonResult))
+            throw new RuntimeException("Error while receiving respond from API regarding user ID, username " + userName);
+        return ApiHandler.getInstance().getGson().fromJson(jsonResult.body().get("data"), new TypeToken<List<Integer>>() {
+        }.getType());
+    }
+
+    private ArrayList<Integer> getUserDislikes(String userName) throws IOException {
+        UsersApi usersApi = ApiHandler.getInstance().getUsersApi();
+        Response<JsonObject> jsonResult = usersApi.getUserDislikes(userName).execute();
+        if (!ResponseHandler.validateJsonResponse(jsonResult))
+            throw new RuntimeException("Error while receiving respond from API regarding user ID, username " + userName);
+        return ApiHandler.getInstance().getGson().fromJson(jsonResult.body().get("data"), new TypeToken<List<Integer>>() {
+        }.getType());
+    }
+
+    private ArrayList<Integer> getUserFavourites(String userName) throws IOException {
+        UsersApi usersApi = ApiHandler.getInstance().getUsersApi();
+        Response<JsonObject> jsonResult = usersApi.getUserFavourites(userName).execute();
+        if (!ResponseHandler.validateJsonResponse(jsonResult))
+            throw new RuntimeException("Error while receiving respond from API regarding user ID, username " + userName);
+        return ApiHandler.getInstance().getGson().fromJson(jsonResult.body().get("data"), new TypeToken<List<Integer>>() {
+        }.getType());
+    }
+
+    private LoggedInUser getUserData(String userName) throws IOException {
+        LoggedInUser user = new LoggedInUser(getUserID(userName), userName);
+        user.setDisliked(getUserDislikes(userName));
+        user.setFavourites(getUserFavourites(userName));
+        user.setLiked(getUserLikes(userName));
         return user;
     }
 
@@ -66,7 +64,7 @@ public class AccountLoader extends AsyncTask<String, String, LoggedInUser> {
     protected LoggedInUser doInBackground(String... strings) {
         try {
             return getUserData(strings[0]);
-        } catch (SQLException | InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return null;
