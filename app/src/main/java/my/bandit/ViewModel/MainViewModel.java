@@ -54,6 +54,7 @@ public class MainViewModel extends AndroidViewModel {
         contextWeakReference = new WeakReference<>(application.getBaseContext());
         playingState.setValue(true);
         timerRunning.setValue(false);
+        barProgress.setValue(0);
         updateSeekBar();
     }
 
@@ -145,7 +146,9 @@ public class MainViewModel extends AndroidViewModel {
 
     public void onPostClick(Post post, ImageView imageView) {
         downloadPostImage(imageView, post);
-        downloadPostSong(post);
+        if (barProgress.getValue() != null && barProgress.getValue() == 0)
+            downloadPostSong(post);
+        else continueTimer();
 
     }
 }
