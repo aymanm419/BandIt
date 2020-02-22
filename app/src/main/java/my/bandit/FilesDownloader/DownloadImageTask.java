@@ -15,8 +15,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 
-import my.bandit.Api.ApiHandler;
-import my.bandit.Api.ResponseHandler;
+import my.bandit.Api.Api;
+import my.bandit.Api.ApiResponse;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -37,12 +37,12 @@ public class DownloadImageTask {
     }
 
     public void downloadFile(String remoteDirectory) {
-        final ApiHandler apiHandler = ApiHandler.getInstance();
-        Call<ResponseBody> call = apiHandler.getFilesApi().getFile(remoteDirectory);
+        final Api api = Api.getInstance();
+        Call<ResponseBody> call = api.getFilesApi().getFile(remoteDirectory);
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                if (!ResponseHandler.validateResponse(response))
+                if (!ApiResponse.validateResponse(response))
                     return;
                 new saveFile().execute(response.body());
             }

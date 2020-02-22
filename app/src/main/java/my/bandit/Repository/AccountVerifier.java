@@ -7,19 +7,22 @@ import com.google.gson.JsonObject;
 
 import java.io.IOException;
 
-import my.bandit.Api.ApiHandler;
-import my.bandit.Api.ResponseHandler;
-import my.bandit.Api.UsersApi;
+import my.bandit.Api.Api;
+import my.bandit.Api.ApiException;
+import my.bandit.Api.ApiResponse;
+import my.bandit.Api.UsersDataApi;
 import retrofit2.Response;
 
 public class AccountVerifier extends AsyncTask<String, String, Boolean> {
 
-    private boolean verifyAccount(String username, String password) throws IOException {
-        UsersApi usersApi = ApiHandler.getInstance().getUsersApi();
-        Response<JsonObject> jsonResult = usersApi.validateUserCredentials(username, password).execute();
-        if (!ResponseHandler.validateJsonResponse(jsonResult))
+    private boolean verifyAccount(String userName, String password) throws IOException, ApiException {
+        UsersDataApi usersDataApi = Api.getInstance().getUsersDataApi();
+        Response<JsonObject> jsonResult = usersDataApi.validateUserCredentials(userName, password).execute();
+        if (!ApiResponse.validateResponse(jsonResult))
+            throw new ApiException("Error while receiving respond from API regarding user ID, username " + userName);
+        if (!ApiResponse.validateJsonResponse(jsonResult))
             return false;
-        Log.i("Account Validation", jsonResult.body().get("message").toString());
+        Log.i("Account Validation", jsonResult.body().get("data").toString());
         return true;
     }
 

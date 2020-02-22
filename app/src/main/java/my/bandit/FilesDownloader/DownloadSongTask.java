@@ -8,8 +8,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import my.bandit.Api.ApiHandler;
-import my.bandit.Api.ResponseHandler;
+import my.bandit.Api.Api;
+import my.bandit.Api.ApiResponse;
 import my.bandit.PostsCache;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -46,13 +46,13 @@ public class DownloadSongTask {
     }
     public File downloadFile(String... strings) throws IOException {
         final String remoteDirectory = strings[0];
-        final ApiHandler apiHandler = ApiHandler.getInstance();
+        final Api api = Api.getInstance();
         PostsCache postsCache = PostsCache.getInstance();
         if (postsCache.isCached(remoteDirectory))
             return postsCache.getSong(remoteDirectory);
-        Call<ResponseBody> call = apiHandler.getFilesApi().getFile(remoteDirectory);
+        Call<ResponseBody> call = api.getFilesApi().getFile(remoteDirectory);
         Response<ResponseBody> response = call.execute();
-        if (ResponseHandler.validateResponse(response)) {
+        if (ApiResponse.validateResponse(response)) {
             File file = saveToDisk(response.body());
             postsCache.cacheSong(remoteDirectory, file);
             return file;

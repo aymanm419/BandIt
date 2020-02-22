@@ -12,8 +12,8 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
-import my.bandit.Api.ApiHandler;
-import my.bandit.Api.ResponseHandler;
+import my.bandit.Api.Api;
+import my.bandit.Api.ApiResponse;
 import my.bandit.Model.Post;
 import my.bandit.ViewModel.HomeViewModel;
 import retrofit2.Call;
@@ -21,12 +21,12 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class PostsLoader implements Callback<JsonObject> {
-    private HomeViewModel postsViewModel;
+    private HomeViewModel homeViewModel;
     private WeakReference<SwipeRefreshLayout> swipeRefreshLayoutRef;
     private WeakReference<Context> contextWeakReference;
 
-    public PostsLoader(HomeViewModel postsViewModel, SwipeRefreshLayout swipeRefreshLayout, Context context) {
-        this.postsViewModel = postsViewModel;
+    public PostsLoader(HomeViewModel homeViewModel, SwipeRefreshLayout swipeRefreshLayout, Context context) {
+        this.homeViewModel = homeViewModel;
         this.swipeRefreshLayoutRef = new WeakReference<>(swipeRefreshLayout);
         this.contextWeakReference = new WeakReference<>(context);
     }
@@ -39,11 +39,11 @@ public class PostsLoader implements Callback<JsonObject> {
     }
 
     private void postValue(ArrayList<Post> posts) {
-        postsViewModel.getPosts().postValue(posts);
+        homeViewModel.getPosts().postValue(posts);
     }
 
     public void loadPosts(int startPost, int endPost) {
-        Call<JsonObject> call = ApiHandler.getInstance().getFilesApi().getPosts(startPost, endPost);
+        Call<JsonObject> call = Api.getInstance().getFilesApi().getPosts(startPost, endPost);
         call.enqueue(this);
     }
 
@@ -51,12 +51,12 @@ public class PostsLoader implements Callback<JsonObject> {
     public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
         refreshLayout();
         Context context = contextWeakReference.get();
-        if (!ResponseHandler.validateJsonResponse(response)) {
+        if (!ApiResponse.validateJsonResponse(response)) {
             if (context != null)
                 Toast.makeText(context, "Failed to connect to server.", Toast.LENGTH_SHORT).show();
             return;
         }
-        ArrayList<Post> posts = ApiHandler.getInstance().
+        ArrayList<Post> posts = Api.getInstance().
                 getGson().fromJson(response.body().get("data"), new TypeToken<List<Post>>() {
         }.getType());
         postValue(posts);

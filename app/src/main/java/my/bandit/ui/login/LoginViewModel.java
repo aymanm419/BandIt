@@ -82,14 +82,11 @@ public class LoginViewModel extends ViewModel {
 
     // A placeholder username validation check
     private boolean isUsernameInvalid(String username) {
-        if (username == null) {
-            return true;
-        }
-        return username.length() < 4 || username.length() >= 14;
+        return username == null;
     }
 
     // A placeholder password validation check
     private boolean isPasswordInvalid(String password) {
-        return password == null || password.trim().length() <= 5;
+        return password == null;
     }
 }

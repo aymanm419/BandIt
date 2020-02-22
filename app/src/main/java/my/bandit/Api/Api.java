@@ -7,16 +7,18 @@ import lombok.Getter;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class ApiHandler {
-    private static ApiHandler apiHandler;
+public class Api {
+    private static Api api;
     @Getter
     private FilesApi filesApi;
     @Getter
-    private UsersApi usersApi;
+    private UsersDataApi usersDataApi;
+    @Getter
+    private UsersActionApi usersActionApi;
     @Getter
     private Gson gson;
 
-    private ApiHandler() {
+    private Api() {
         gson = new GsonBuilder()
                 .setLenient()
                 .create();
@@ -27,12 +29,13 @@ public class ApiHandler {
                 .build();
 
         filesApi = retrofit.create(FilesApi.class);
-        usersApi = retrofit.create(UsersApi.class);
+        usersDataApi = retrofit.create(UsersDataApi.class);
+        usersActionApi = retrofit.create(UsersActionApi.class);
     }
 
-    public static ApiHandler getInstance() {
-        if (apiHandler == null)
-            apiHandler = new ApiHandler();
-        return apiHandler;
+    public static Api getInstance() {
+        if (api == null)
+            api = new Api();
+        return api;
     }
 }

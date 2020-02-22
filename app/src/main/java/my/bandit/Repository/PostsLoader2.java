@@ -14,15 +14,12 @@ import my.bandit.Model.Post;
 import my.bandit.Model.Song;
 import my.bandit.ViewModel.FavouriteViewModel;
 
-// الإسم دا عقابا للهبد ف ال "single responsibility" بتاع ال تاني
 public class PostsLoader2 extends AsyncTask<ArrayList<Integer>, Void, ArrayList<Post>> {
 
-    private FavouriteViewModel postsViewModel;
-    //private WeakReference<SwipeRefreshLayout> swipeRefreshLayoutRef;
+    private FavouriteViewModel favouriteViewModel;
 
-    public PostsLoader2(FavouriteViewModel postsViewModel) {
-        this.postsViewModel = postsViewModel;
-        //this.swipeRefreshLayoutRef = new WeakReference<>(swipeRefreshLayout);
+    public PostsLoader2(FavouriteViewModel favouriteViewModel) {
+        this.favouriteViewModel = favouriteViewModel;
     }
 
     private ArrayList<Post> LoadPosts(ArrayList<Integer> favourites) throws SQLException {
@@ -76,9 +73,6 @@ public class PostsLoader2 extends AsyncTask<ArrayList<Integer>, Void, ArrayList<
     @Override
     protected void onPostExecute(ArrayList<Post> posts) {
         super.onPostExecute(posts);
-        postsViewModel.getPosts().postValue(posts);
-        /*SwipeRefreshLayout swipeRefreshLayout = swipeRefreshLayoutRef.get();
-        if (swipeRefreshLayout != null)
-            swipeRefreshLayout.setRefreshing(false);*/
+        favouriteViewModel.getPosts().postValue(posts);
     }
 }
