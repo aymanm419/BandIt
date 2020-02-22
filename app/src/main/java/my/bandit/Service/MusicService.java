@@ -11,10 +11,11 @@ import androidx.annotation.Nullable;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 
 import lombok.Getter;
 import lombok.Setter;
-import my.bandit.ViewModel.HomeViewModel;
+import my.bandit.ViewModel.MainViewModel;
 
 public class MusicService extends Service {
     private final IBinder binder = new LocalBinder();
@@ -23,8 +24,7 @@ public class MusicService extends Service {
     @Setter
     @Getter
     private boolean isPrepared;
-    @Setter
-    private HomeViewModel homeViewModel;
+    private WeakReference<MainViewModel> viewModelRef;
     @Override
     public void onCreate() {
         super.onCreate();
@@ -39,11 +39,17 @@ public class MusicService extends Service {
         super.onDestroy();
     }
 
+    public void setViewModelRef(MainViewModel viewModelRef) {
+        this.viewModelRef = new WeakReference<>(viewModelRef);
+    }
+
     private void Init() {
         mediaPlayer.setOnPreparedListener(mp -> {
             isPrepared = true;
             mp.start();
-            homeViewModel.getSongDuration().postValue(mp.getDuration());
+            MainViewModel mainViewModel = viewModelRef.get();
+            if (mainViewModel != null)
+                mainViewModel.getSongDuration().postValue(mp.getDuration());
         });
     }
 

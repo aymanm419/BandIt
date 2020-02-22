@@ -1,26 +1,46 @@
 package my.bandit;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import my.bandit.Service.MusicService;
+import my.bandit.ViewModel.MainViewModel;
 import my.bandit.data.LoginDataSource;
 import my.bandit.data.LoginRepository;
 import my.bandit.ui.login.LoginActivity;
 
 public class MainActivity extends AppCompatActivity {
+    private MainViewModel mainViewModel;
+    private ServiceConnection connection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            MusicService.LocalBinder binder = (MusicService.LocalBinder) service;
+            mainViewModel.getMusicServiceLive().setValue(binder.getService());
+            binder.getService().setViewModelRef(mainViewModel);
+        }
 
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            mainViewModel.getMusicServiceLive().setValue(null);
+        }
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,6 +48,10 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView bottomNavigationView = findViewById(R.id.NavView);
         NavController navController = Navigation.findNavController(this, R.id.fragment);
         NavigationUI.setupWithNavController(bottomNavigationView, navController);
+        mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
+        Intent intent = new Intent(getApplicationContext(), MusicService.class);
+        getApplicationContext().startService(intent);
+        getApplicationContext().bindService(intent, connection, Context.BIND_AUTO_CREATE);
     }
 
     @Override

@@ -1,12 +1,6 @@
 package my.bandit;
 
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.IBinder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,28 +18,19 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
-import my.bandit.FilesDownloader.DownloadImageTask;
-import my.bandit.FilesDownloader.DownloadSongTask;
 import my.bandit.Model.Post;
 import my.bandit.Repository.PostsLoader;
-import my.bandit.Service.MusicService;
 import my.bandit.ViewAdapter.PostsAdapter;
 import my.bandit.ViewModel.HomeViewModel;
+import my.bandit.ViewModel.MainViewModel;
 
 public class Home extends Fragment {
-
     private HomeViewModel homeViewModel;
-
+    private MainViewModel mainViewModel;
     private ArrayList<Post> posts;
     private PostsAdapter postsAdapter;
-
     private RecyclerView postsView;
     private SeekBar seekBar;
     private ImageView stateImage, previousImage, nextImage;
@@ -53,42 +38,8 @@ public class Home extends Fragment {
     private SwipeRefreshLayout swipeRefreshLayout;
     private TextView songName, bandName;
 
-    private MusicService musicService;
-
-    final private ExecutorService pool = Executors.newCachedThreadPool();
-
-    public static Home home;
-
-    private Handler handler;
-    private boolean mBound;
-    private boolean timerRunning;
-    private Runnable updateSeekBar;
-    private ServiceConnection connection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName className,
-                                       IBinder service) {
-            MusicService.LocalBinder binder = (MusicService.LocalBinder) service;
-            musicService = binder.getService();
-            musicService.setHomeViewModel(homeViewModel);
-            mBound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            mBound = false;
-        }
-    };
-
     public static Home newInstance() {
-        if (home == null)
-            home = new Home();
-        return home;
-    }
-
-    private void startSong(final View view, final File song) throws IOException {
-        musicService.setDataSource(song);
-        musicService.preparePlayer();
-        homeViewModel.getPlayingState().postValue(true);
+        return new Home();
     }
 
     private void InitObservers(final View view) {
@@ -96,36 +47,22 @@ public class Home extends Fragment {
             postsAdapter.setPosts(updatedList);
             postsAdapter.notifyDataSetChanged();
         });
-        homeViewModel.getSongDuration().observe(getViewLifecycleOwner(), integer -> {
+        mainViewModel.getSongDuration().observe(getViewLifecycleOwner(), integer -> {
             seekBar.setMax(integer);
         });
-        homeViewModel.getCurrentlyPlayedPost().observe(getViewLifecycleOwner(), post -> {
-            PostsCache.getInstance().setLastPlayed(post);
-            new DownloadImageTask(view.getContext().getFilesDir() + post.getSong().getBandName(),
-                    view.getContext(), currentSongImage).downloadFile(post.getPictureDir());
+        mainViewModel.getCurrentlyPlayedPost().observe(getViewLifecycleOwner(), post -> {
+            mainViewModel.onPostClick(post, currentSongImage);
             songName.setText(post.getSong().getSongName());
             bandName.setText(post.getSong().getBandName());
-            Runnable runnable = () -> {
-                DownloadSongTask downloadSongTask = new DownloadSongTask(view.getContext().getFilesDir() + post.getSong().getSongName());
-                try {
-                    File file = downloadSongTask.downloadFile(post.getSong().getSongFileDir());
-                    startSong(view, file);
-                    continueTimer();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            };
-            pool.execute(runnable);
+
         });
-        homeViewModel.getPlayingState().observe(getViewLifecycleOwner(), aBoolean -> {
+        mainViewModel.getPlayingState().observe(getViewLifecycleOwner(), aBoolean -> {
             if (aBoolean) {
                 Glide.with(view.getContext()).load(R.drawable.ic_play_arrow_black_24dp).into(stateImage);
-                if (mBound)
-                    musicService.continuePlaying();
+                mainViewModel.continueTimer();
             } else {
                 Glide.with(view.getContext()).load(R.drawable.ic_pause_black_24dp).into(stateImage);
-                if (mBound)
-                    musicService.pausePlaying();
+                mainViewModel.pauseTimer();
             }
         });
 
@@ -145,46 +82,36 @@ public class Home extends Fragment {
 
     private void attachViewListeners(final View view) {
         stateImage.setOnClickListener(v -> {
-            boolean currentValue = homeViewModel.getPlayingState().getValue();
-            homeViewModel.getPlayingState().setValue(!currentValue);
+            boolean currentValue = mainViewModel.getPlayingState().getValue();
+            mainViewModel.getPlayingState().setValue(!currentValue);
         });
         previousImage.setOnClickListener(v -> {
-            if (homeViewModel.getCurrentlyPlayedPostIndex().getValue() != null
-                    && homeViewModel.getPosts().getValue() != null) {
-                int currentPost = homeViewModel.getCurrentlyPlayedPostIndex().getValue();
-                if (currentPost > 0)
-                    currentPost--;
-                homeViewModel.getCurrentlyPlayedPost().setValue(homeViewModel.getPosts().getValue().get(currentPost));
-            }
+            mainViewModel.playPrevious();
         });
         nextImage.setOnClickListener(v -> {
-            if (homeViewModel.getCurrentlyPlayedPostIndex().getValue() != null
-                    && homeViewModel.getPosts().getValue() != null) {
-                int currentPost = homeViewModel.getCurrentlyPlayedPostIndex().getValue();
-                List<Post> list = homeViewModel.getPosts().getValue();
-                if (currentPost + 1 < list.size())
-                    currentPost++;
-                homeViewModel.getCurrentlyPlayedPost().setValue(list.get(currentPost));
-            }
+            mainViewModel.playNext();
         });
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (fromUser && !musicService.getMediaPlayer().isPlaying())
-                    musicService.continuePlaying();
+                if (fromUser)
+                    mainViewModel.moveBar(progress);
+                mainViewModel.continueTimer();
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-                pauseTimer();
+                mainViewModel.pauseTimer();
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                continueTimer();
-                if (musicService.isPrepared())
-                    musicService.seek(seekBar.getProgress());
+
+
             }
+        });
+        mainViewModel.getBarProgress().observe(getViewLifecycleOwner(), integer -> {
+            seekBar.setProgress(integer);
         });
         swipeRefreshLayout.setOnRefreshListener(() -> {
             PostsLoader postsLoader = new PostsLoader(homeViewModel, swipeRefreshLayout, view.getContext());
@@ -192,32 +119,15 @@ public class Home extends Fragment {
         });
     }
 
-    private void pauseTimer() {
-        timerRunning = false;
-    }
-
-    private void continueTimer() {
-        timerRunning = true;
-    }
-
-    private void updateSeekBar() {
-        if (mBound && timerRunning) {
-            if (musicService.isPrepared()) {
-                seekBar.setProgress(musicService.getMediaPlayer().getCurrentPosition());
-            }
-        }
-        handler.postDelayed(updateSeekBar, 250);
-    }
 
     private void initVariables() {
-        continueTimer();
-        updateSeekBar = this::updateSeekBar;
-        handler = new Handler();
         posts = new ArrayList<>();
-        homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
+        homeViewModel = new ViewModelProvider(getActivity()).get(HomeViewModel.class);
+        mainViewModel = new ViewModelProvider(getActivity()).get(MainViewModel.class);
         postsAdapter = new PostsAdapter(getContext(), posts, (post, position) -> {
-            homeViewModel.getCurrentlyPlayedPost().setValue(post);
-            homeViewModel.getCurrentlyPlayedPostIndex().setValue(position);
+            mainViewModel.getCurrentlyPlayedPost().setValue(post);
+            mainViewModel.getCurrentlyPlayedPostIndex().setValue(position);
+            mainViewModel.getPosts().setValue(homeViewModel.getPosts().getValue());
         });
         postsView.setLayoutManager(new LinearLayoutManager(getContext()));
         postsView.setAdapter(postsAdapter);
@@ -231,7 +141,6 @@ public class Home extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        pool.shutdown();
     }
 
     @Override
@@ -247,10 +156,6 @@ public class Home extends Fragment {
         initVariables();
         InitObservers(getView());
         attachViewListeners(getView());
-        updateSeekBar();
-        Intent intent = new Intent(getActivity().getApplicationContext(), MusicService.class);
-        getView().getContext().startService(intent);
-        getView().getContext().bindService(intent, connection, Context.BIND_AUTO_CREATE);
 
     }
 

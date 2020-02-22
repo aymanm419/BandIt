@@ -5,17 +5,10 @@ import android.util.Log;
 import java.io.File;
 import java.util.HashMap;
 
-import lombok.Getter;
-import lombok.Setter;
-import my.bandit.Model.Post;
-
 public class PostsCache {
     private static PostsCache postsCache;
 
     private HashMap<String, File> cache;
-    @Setter
-    @Getter
-    private Post lastPlayed;
 
     private PostsCache() {
         cache = new HashMap<>();
