@@ -12,14 +12,14 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import my.bandit.Model.Post;
+import my.bandit.ViewModel.MainViewModel;
 import my.bandit.ViewModel.NowPlayingViewModel;
 
 public class NowPlaying extends Fragment {
-
+    private MainViewModel mainViewModel;
     private NowPlayingViewModel mViewModel;
     private ImageView likeImage, dislikeImage, heartImage;
-    private Post currPost = null;
+
 
     public static NowPlaying newInstance() {
         return new NowPlaying();
@@ -34,7 +34,8 @@ public class NowPlaying extends Fragment {
     private void init() {
         Log.d("Now playing", "View created");
         mViewModel = new ViewModelProvider(this).get(NowPlayingViewModel.class);
-        mViewModel.fetchNewData(currPost);
+        mainViewModel = new ViewModelProvider(getActivity()).get(MainViewModel.class);
+        mViewModel.fetchNewData(mainViewModel.getCurrentlyPlayedPost().getValue());
         likeImage = getView().findViewById(R.id.PostLikeImage);
         dislikeImage = getView().findViewById(R.id.PostUnlikeImage);
         heartImage = getView().findViewById(R.id.PostHeartImage);
@@ -46,8 +47,9 @@ public class NowPlaying extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        if (currPost != null) {
-            init();
+        init();
+        if (mainViewModel.getCurrentlyPlayedPost().getValue() != null) {
+
             mViewModel.getLiked().observe(getViewLifecycleOwner(), aBoolean -> {
                 if (aBoolean) {
                     likeImage.setImageResource(R.drawable.android_like_image);

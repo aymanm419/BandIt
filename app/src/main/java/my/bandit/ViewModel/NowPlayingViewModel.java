@@ -23,10 +23,12 @@ public class NowPlayingViewModel extends ViewModel {
     Post post;
 
     public void fetchNewData(Post post) {
-        this.post = post;
-        liked.setValue(user.getLiked().contains(post.getPostID()));
-        disliked.setValue(user.getDisliked().contains(post.getPostID()));
-        favourite.setValue(user.getFavourites().contains(post.getPostID()));
+        if (post != null) {
+            this.post = post;
+            liked.setValue(user.getLiked().contains(post.getPostID()));
+            disliked.setValue(user.getDisliked().contains(post.getPostID()));
+            favourite.setValue(user.getFavourites().contains(post.getPostID()));
+        }
     }
 
     public void like() {

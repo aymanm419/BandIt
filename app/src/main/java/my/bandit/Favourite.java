@@ -17,9 +17,10 @@ import java.util.ArrayList;
 import my.bandit.Model.Post;
 import my.bandit.ViewAdapter.PostsAdapter;
 import my.bandit.ViewModel.FavouriteViewModel;
+import my.bandit.ViewModel.MainViewModel;
 
 public class Favourite extends Fragment {
-
+    private MainViewModel mainViewModel;
     private FavouriteViewModel mViewModel;
     private RecyclerView postsView;
     private ArrayList<Post> posts;
@@ -39,6 +40,7 @@ public class Favourite extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mViewModel = new ViewModelProvider(this).get(FavouriteViewModel.class);
+        mainViewModel = new ViewModelProvider(getActivity()).get(MainViewModel.class);
         mViewModel.fetchPosts();
         postsView = getView().findViewById(R.id.favList);
         posts = mViewModel.getPosts().getValue();
