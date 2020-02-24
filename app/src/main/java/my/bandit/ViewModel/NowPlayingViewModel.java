@@ -5,9 +5,9 @@ import androidx.lifecycle.ViewModel;
 
 import lombok.Getter;
 import my.bandit.Data.LoginDataSource;
-import my.bandit.Data.LoginRepository;
-import my.bandit.Data.model.LoggedInUser;
+import my.bandit.Model.LoggedInUser;
 import my.bandit.Model.Post;
+import my.bandit.Repository.LoginRepository;
 import my.bandit.Repository.UpdateFavourite;
 import my.bandit.Repository.UpdateLikes;
 

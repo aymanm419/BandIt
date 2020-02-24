@@ -12,7 +12,7 @@ import my.bandit.Api.ApiException;
 import my.bandit.Api.ApiResponse;
 import my.bandit.Api.UsersDataApi;
 import my.bandit.Data.Result;
-import my.bandit.Data.model.LoggedInUser;
+import my.bandit.Model.LoggedInUser;
 import retrofit2.Response;
 
 public class AccountRegister extends AsyncTask<String, String, Result> {

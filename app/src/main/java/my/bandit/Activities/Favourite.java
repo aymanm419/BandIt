@@ -1,4 +1,4 @@
-package my.bandit;
+package my.bandit.Activities;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 
 import my.bandit.Model.Post;
+import my.bandit.R;
 import my.bandit.ViewAdapter.PostsAdapter;
 import my.bandit.ViewModel.FavouriteViewModel;
 import my.bandit.ViewModel.MainViewModel;

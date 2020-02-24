@@ -13,7 +13,7 @@ import my.bandit.Api.Api;
 import my.bandit.Api.ApiException;
 import my.bandit.Api.ApiResponse;
 import my.bandit.Api.UsersDataApi;
-import my.bandit.Data.model.LoggedInUser;
+import my.bandit.Model.LoggedInUser;
 import my.bandit.Model.Post;
 import retrofit2.Response;
 

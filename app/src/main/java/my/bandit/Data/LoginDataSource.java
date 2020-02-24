@@ -3,7 +3,7 @@ package my.bandit.Data;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
-import my.bandit.Data.model.LoggedInUser;
+import my.bandit.Model.LoggedInUser;
 import my.bandit.Repository.AccountLoader;
 import my.bandit.Repository.AccountVerifier;
 

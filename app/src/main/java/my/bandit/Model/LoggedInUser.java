@@ -1,9 +1,8 @@
-package my.bandit.Data.model;
+package my.bandit.Model;
 
 import java.util.ArrayList;
 
 import lombok.Data;
-import my.bandit.Model.Post;
 
 /**
  * Data class that captures user information for logged in users retrieved from LoginRepository

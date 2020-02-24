@@ -15,7 +15,7 @@
         android:theme="@style/AppTheme">
         <service android:name="my.bandit.Service.MusicService"></service>
         <activity
-            android:name=".ui.Login.LoginActivity"
+            android:name=".Login.LoginActivity"
             android:label="Bandit">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,7 +23,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity" />
+        <activity android:name=".Activities.MainActivity" />
 
     </application>
 

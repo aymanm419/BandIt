@@ -8,9 +8,9 @@ import androidx.lifecycle.ViewModel;
 import java.util.ArrayList;
 
 import my.bandit.Data.LoginDataSource;
-import my.bandit.Data.LoginRepository;
-import my.bandit.Data.model.LoggedInUser;
+import my.bandit.Model.LoggedInUser;
 import my.bandit.Model.Post;
+import my.bandit.Repository.LoginRepository;
 
 public class FavouriteViewModel extends ViewModel {
     private MutableLiveData<ArrayList<Post>> posts = new MutableLiveData<>();

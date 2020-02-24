@@ -1,10 +1,11 @@
-package my.bandit.Data;
+package my.bandit.Repository;
 
 import java.util.concurrent.ExecutionException;
 
 import lombok.Getter;
-import my.bandit.Data.model.LoggedInUser;
-import my.bandit.Repository.AccountRegister;
+import my.bandit.Data.LoginDataSource;
+import my.bandit.Data.Result;
+import my.bandit.Model.LoggedInUser;
 
 /**
  * Class that requests authentication and user information from the remote data source and

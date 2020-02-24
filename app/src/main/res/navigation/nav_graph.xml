@@ -6,7 +6,7 @@
     app:startDestination="@id/home">
     <fragment
         android:id="@+id/home"
-        android:name="my.bandit.Home"
+        android:name="my.bandit.Activities.Home"
         android:label="home_fragment"
         tools:layout="@layout/home_fragment">
         <action
@@ -21,17 +21,17 @@
     </fragment>
     <fragment
         android:id="@+id/favourite"
-        android:name="my.bandit.Favourite"
+        android:name="my.bandit.Activities.Favourite"
         android:label="favourite_fragment"
         tools:layout="@layout/favourite_fragment" />
     <fragment
         android:id="@+id/nowPlaying"
-        android:name="my.bandit.NowPlaying"
+        android:name="my.bandit.Activities.NowPlaying"
         android:label="now_playing_fragment"
         tools:layout="@layout/now_playing_fragment" />
     <fragment
         android:id="@+id/search"
-        android:name="my.bandit.Search"
+        android:name="my.bandit.Activities.Search"
         android:label="search_fragment"
         tools:layout="@layout/search_fragment" />
 </navigation>

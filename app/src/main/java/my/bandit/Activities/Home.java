@@ -1,4 +1,4 @@
-package my.bandit;
+package my.bandit.Activities;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -22,6 +22,7 @@ import com.bumptech.glide.Glide;
 import java.util.ArrayList;
 
 import my.bandit.Model.Post;
+import my.bandit.R;
 import my.bandit.Repository.PostsLoader;
 import my.bandit.ViewAdapter.PostsAdapter;
 import my.bandit.ViewModel.HomeViewModel;

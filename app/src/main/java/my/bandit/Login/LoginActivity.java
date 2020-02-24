@@ -17,7 +17,7 @@ import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
-import my.bandit.MainActivity;
+import my.bandit.Activities.MainActivity;
 import my.bandit.R;
 
 public class LoginActivity extends AppCompatActivity {
