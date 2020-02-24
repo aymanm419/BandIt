@@ -19,11 +19,11 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import my.bandit.Data.LoginDataSource;
+import my.bandit.Data.LoginRepository;
 import my.bandit.Service.MusicService;
 import my.bandit.ViewModel.MainViewModel;
-import my.bandit.data.LoginDataSource;
-import my.bandit.data.LoginRepository;
-import my.bandit.ui.login.LoginActivity;
+import my.bandit.ui.Login.LoginActivity;
 
 public class MainActivity extends AppCompatActivity {
     private MainViewModel mainViewModel;

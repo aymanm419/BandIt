@@ -1,4 +1,4 @@
-package my.bandit.ui.login;
+package my.bandit.ui.Login;
 
 import android.util.Log;
 
@@ -8,12 +8,12 @@ import androidx.lifecycle.ViewModel;
 
 import java.util.concurrent.ExecutionException;
 
+import my.bandit.Data.LoginDataSource;
+import my.bandit.Data.LoginRepository;
+import my.bandit.Data.Result;
+import my.bandit.Data.model.LoggedInUser;
 import my.bandit.R;
 import my.bandit.Repository.AccountRegister;
-import my.bandit.data.LoginDataSource;
-import my.bandit.data.LoginRepository;
-import my.bandit.data.Result;
-import my.bandit.data.model.LoggedInUser;
 
 public class LoginViewModel extends ViewModel {
 

@@ -33,7 +33,7 @@ public class NowPlaying extends Fragment {
 
     private void init() {
         Log.d("Now playing", "View created");
-        mViewModel = new ViewModelProvider(this).get(NowPlayingViewModel.class);
+        mViewModel = new ViewModelProvider(getActivity()).get(NowPlayingViewModel.class);
         mainViewModel = new ViewModelProvider(getActivity()).get(MainViewModel.class);
         mViewModel.fetchNewData(mainViewModel.getCurrentlyPlayedPost().getValue());
         likeImage = getView().findViewById(R.id.PostLikeImage);

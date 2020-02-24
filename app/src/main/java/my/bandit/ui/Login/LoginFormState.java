@@ -1,4 +1,4 @@
-package my.bandit.ui.login;
+package my.bandit.ui.Login;
 
 import androidx.annotation.Nullable;
 

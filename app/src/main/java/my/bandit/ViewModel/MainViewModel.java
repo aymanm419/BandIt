@@ -67,6 +67,7 @@ public class MainViewModel extends AndroidViewModel {
 
     public void pauseTimer() {
         timerRunning.postValue(false);
+        playingState.postValue(false);
         MusicService musicService = musicServiceLive.getValue();
         if (musicService != null)
             musicService.pausePlaying();
@@ -74,12 +75,13 @@ public class MainViewModel extends AndroidViewModel {
 
     public void continueTimer() {
         timerRunning.postValue(true);
+        playingState.postValue(true);
         MusicService musicService = musicServiceLive.getValue();
         if (musicService != null)
             musicService.continuePlaying();
     }
 
-    private void downloadPostImage(ImageView imageView, Post post) {
+    public void downloadPostImage(ImageView imageView, Post post) {
         Context context = contextWeakReference.get();
         if (context != null)
             new DownloadImageTask(context.getFilesDir() + post.getPictureDir(),
@@ -95,7 +97,13 @@ public class MainViewModel extends AndroidViewModel {
         }
     }
 
-    private void downloadPostSong(Post post) {
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        pool.shutdown();
+    }
+
+    public void downloadPostSong(Post post) {
         Context context = contextWeakReference.get();
         if (context != null) {
             Runnable runnable = () -> {
@@ -146,9 +154,6 @@ public class MainViewModel extends AndroidViewModel {
 
     public void onPostClick(Post post, ImageView imageView) {
         downloadPostImage(imageView, post);
-        if (barProgress.getValue() != null && barProgress.getValue() == 0)
-            downloadPostSong(post);
-        else continueTimer();
-
+        downloadPostSong(post);
     }
 }

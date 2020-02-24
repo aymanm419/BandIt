@@ -7,10 +7,10 @@ import androidx.lifecycle.ViewModel;
 
 import java.util.ArrayList;
 
+import my.bandit.Data.LoginDataSource;
+import my.bandit.Data.LoginRepository;
+import my.bandit.Data.model.LoggedInUser;
 import my.bandit.Model.Post;
-import my.bandit.data.LoginDataSource;
-import my.bandit.data.LoginRepository;
-import my.bandit.data.model.LoggedInUser;
 
 public class FavouriteViewModel extends ViewModel {
     private MutableLiveData<ArrayList<Post>> posts = new MutableLiveData<>();
@@ -18,7 +18,7 @@ public class FavouriteViewModel extends ViewModel {
 
     public void fetchPosts() {
         Log.i("Database", "Fetching favourite posts");
-        posts.setValue(new ArrayList<>());
+        posts.setValue(user.getFavourites());
     }
 
     public MutableLiveData<ArrayList<Post>> getPosts() {

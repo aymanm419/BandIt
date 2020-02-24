@@ -1,23 +1,21 @@
-package my.bandit.data.model;
+package my.bandit.Data.model;
 
 import java.util.ArrayList;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import my.bandit.Model.Post;
 
 /**
  * Data class that captures user information for logged in users retrieved from LoginRepository
  */
+@Data
 public class LoggedInUser {
 
     private int userId;
     private String displayName;
-    @Getter@Setter
-    private ArrayList<Integer> favourites;
-    @Getter@Setter
-    private ArrayList<Integer> liked;
-    @Getter@Setter
-    private ArrayList<Integer> disliked;
+    private ArrayList<Post> favourites;
+    private ArrayList<Post> liked;
+    private ArrayList<Post> disliked;
 
     public LoggedInUser(int userId, String displayName) {
         this.userId = userId;

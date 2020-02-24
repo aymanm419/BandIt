@@ -1,6 +1,7 @@
 package my.bandit;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,10 +52,10 @@ public class Home extends Fragment {
             seekBar.setMax(integer);
         });
         mainViewModel.getCurrentlyPlayedPost().observe(getViewLifecycleOwner(), post -> {
-            mainViewModel.onPostClick(post, currentSongImage);
+            Log.i("Home", "Played again");
+            mainViewModel.downloadPostImage(currentSongImage, post);
             songName.setText(post.getSong().getSongName());
             bandName.setText(post.getSong().getBandName());
-
         });
         mainViewModel.getPlayingState().observe(getViewLifecycleOwner(), aBoolean -> {
             if (aBoolean) {
@@ -98,7 +99,6 @@ public class Home extends Fragment {
                     mainViewModel.moveBar(progress);
                     mainViewModel.continueTimer();
                 }
-
             }
 
             @Override
@@ -130,6 +130,7 @@ public class Home extends Fragment {
             mainViewModel.getCurrentlyPlayedPost().setValue(post);
             mainViewModel.getCurrentlyPlayedPostIndex().setValue(position);
             mainViewModel.getPosts().setValue(homeViewModel.getPosts().getValue());
+            mainViewModel.onPostClick(post, currentSongImage);
         });
         postsView.setLayoutManager(new LinearLayoutManager(getContext()));
         postsView.setAdapter(postsAdapter);

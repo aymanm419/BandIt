@@ -1,4 +1,4 @@
-package my.bandit.data;
+package my.bandit.Data;
 
 /**
  * A generic class that holds a result success w/ data or an error exception.

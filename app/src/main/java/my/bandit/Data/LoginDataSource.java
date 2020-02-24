@@ -1,11 +1,11 @@
-package my.bandit.data;
-
-import my.bandit.Repository.AccountLoader;
-import my.bandit.Repository.AccountVerifier;
-import my.bandit.data.model.LoggedInUser;
+package my.bandit.Data;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
+
+import my.bandit.Data.model.LoggedInUser;
+import my.bandit.Repository.AccountLoader;
+import my.bandit.Repository.AccountVerifier;
 
 /**
  * Class that handles authentication w/ login credentials and retrieves user information.

@@ -13,7 +13,8 @@ import my.bandit.Api.Api;
 import my.bandit.Api.ApiException;
 import my.bandit.Api.ApiResponse;
 import my.bandit.Api.UsersDataApi;
-import my.bandit.data.model.LoggedInUser;
+import my.bandit.Data.model.LoggedInUser;
+import my.bandit.Model.Post;
 import retrofit2.Response;
 
 public class AccountLoader extends AsyncTask<String, String, LoggedInUser> {
@@ -29,7 +30,7 @@ public class AccountLoader extends AsyncTask<String, String, LoggedInUser> {
         return jsonResult.body().get("data").getAsInt();
     }
 
-    private ArrayList<Integer> getUserLikes(int userID) throws IOException, ApiException {
+    private ArrayList<Post> getUserLikes(int userID) throws IOException, ApiException {
         UsersDataApi usersDataApi = Api.getInstance().getUsersDataApi();
         Response<JsonObject> jsonResult = usersDataApi.getUserLikes(userID).execute();
         if (!ApiResponse.validateResponse(jsonResult))
@@ -37,29 +38,29 @@ public class AccountLoader extends AsyncTask<String, String, LoggedInUser> {
         if (!ApiResponse.validateJsonResponse(jsonResult))
             throw new ApiException();
 
-        return Api.getInstance().getGson().fromJson(jsonResult.body().get("data"), new TypeToken<ArrayList<Integer>>() {
+        return Api.getInstance().getGson().fromJson(jsonResult.body().get("data"), new TypeToken<ArrayList<Post>>() {
         }.getType());
     }
 
-    private ArrayList<Integer> getUserDislikes(int userID) throws IOException, ApiException {
+    private ArrayList<Post> getUserDislikes(int userID) throws IOException, ApiException {
         UsersDataApi usersDataApi = Api.getInstance().getUsersDataApi();
         Response<JsonObject> jsonResult = usersDataApi.getUserDislikes(userID).execute();
         if (!ApiResponse.validateResponse(jsonResult))
             throw new ApiException("Error while receiving respond from API regarding user, username " + userID);
         if (!ApiResponse.validateJsonResponse(jsonResult))
             throw new ApiException();
-        return Api.getInstance().getGson().fromJson(jsonResult.body().get("data"), new TypeToken<ArrayList<Integer>>() {
+        return Api.getInstance().getGson().fromJson(jsonResult.body().get("data"), new TypeToken<ArrayList<Post>>() {
         }.getType());
     }
 
-    private ArrayList<Integer> getUserFavourites(int userID) throws IOException, ApiException {
+    private ArrayList<Post> getUserFavourites(int userID) throws IOException, ApiException {
         UsersDataApi usersDataApi = Api.getInstance().getUsersDataApi();
         Response<JsonObject> jsonResult = usersDataApi.getUserFavourites(userID).execute();
         if (!ApiResponse.validateResponse(jsonResult))
             throw new ApiException("Error while receiving respond from API regarding user ID, username " + userID);
         if (!ApiResponse.validateJsonResponse(jsonResult))
             throw new ApiException();
-        return Api.getInstance().getGson().fromJson(jsonResult.body().get("data"), new TypeToken<ArrayList<Integer>>() {
+        return Api.getInstance().getGson().fromJson(jsonResult.body().get("data"), new TypeToken<ArrayList<Post>>() {
         }.getType());
     }
 
