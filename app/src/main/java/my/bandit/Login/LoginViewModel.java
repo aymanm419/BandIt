@@ -1,4 +1,4 @@
-package my.bandit.ui.Login;
+package my.bandit.Login;
 
 import android.util.Log;
 
