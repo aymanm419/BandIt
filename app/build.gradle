@@ -55,6 +55,5 @@ dependencies {
     implementation('commons-net:commons-net:3.6') {
         exclude module: 'commons.net.DatagramSocketClient'
     }
-    implementation files('libs\\mysql-connector-java-5.1.48-bin.jar')
 
 }

@@ -24,14 +24,14 @@ public class PostsCache {
         return cache.containsKey(string);
     }
 
-    public void cacheSong(String fileDir, File file) {
+    public void cacheFile(String fileDir, File file) {
         if (isCached(fileDir))
             return;
         cache.put(fileDir, file);
         Log.i("Cache Information", "Cached file with directory = " + fileDir);
     }
 
-    public File getSong(String fileDir) {
+    public File getFile(String fileDir) {
         Log.i("Cache Request", "Asking for file at = " + fileDir);
         if (isCached(fileDir)) {
             Log.i("Cache Request", "Item requested feteched");
