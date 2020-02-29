@@ -17,14 +17,14 @@ public class Api {
     private UsersActionApi usersActionApi;
     @Getter
     private Gson gson;
-
+    private static final String apiSource = "http://10.0.2.2:6969/";
     private Api() {
         gson = new GsonBuilder()
                 .setLenient()
                 .create();
 
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://10.0.2.2:6969/")
+                .baseUrl(apiSource)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
 
@@ -37,5 +37,13 @@ public class Api {
         if (api == null)
             api = new Api();
         return api;
+    }
+
+    public static String getImageSource(String imageName) {
+        return Api.apiSource + "post/file?dir=" + imageName;
+    }
+
+    public static String getSongSource(String songName) {
+        return Api.apiSource + "post/file?dir=" + songName;
     }
 }

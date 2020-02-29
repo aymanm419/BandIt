@@ -54,7 +54,7 @@ public class Home extends Fragment {
         });
         mainViewModel.getCurrentlyPlayedPost().observe(getViewLifecycleOwner(), post -> {
             Log.i("Home", "Played again");
-            mainViewModel.downloadPostImage(currentSongImage, post);
+            mainViewModel.loadPostImage(currentSongImage, post);
             songName.setText(post.getSong().getSongName());
             bandName.setText(post.getSong().getBandName());
         });

@@ -2,19 +2,19 @@ package my.bandit.Service;
 
 import android.app.Service;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
 
 import androidx.annotation.Nullable;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 
 import lombok.Getter;
 import lombok.Setter;
+import my.bandit.Api.Api;
 import my.bandit.ViewModel.MainViewModel;
 
 public class MusicService extends Service {
@@ -29,6 +29,7 @@ public class MusicService extends Service {
     public void onCreate() {
         super.onCreate();
         mediaPlayer = new MediaPlayer();
+        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         Init();
     }
 
@@ -53,10 +54,10 @@ public class MusicService extends Service {
         });
     }
 
-    public void setDataSource(File file) throws IOException {
+    public void setDataSource(String songName) throws IOException {
         setPrepared(false);
         mediaPlayer.reset();
-        mediaPlayer.setDataSource(this, Uri.fromFile(file));
+        mediaPlayer.setDataSource(Api.getSongSource(songName));
 
     }
 

@@ -49,7 +49,7 @@ public class Favourite extends Fragment {
             mainViewModel.getCurrentlyPlayedPost().setValue(post);
             mainViewModel.getCurrentlyPlayedPostIndex().setValue(integer);
             mainViewModel.getPosts().setValue(mViewModel.getPosts().getValue());
-            mainViewModel.downloadPostSong(post);
+            mainViewModel.startPostSong(post);
 
         });
         mViewModel.getPosts().observe(getViewLifecycleOwner(), updatedList -> {

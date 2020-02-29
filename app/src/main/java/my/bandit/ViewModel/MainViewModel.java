@@ -4,7 +4,6 @@ import android.app.Application;
 import android.content.Context;
 import android.os.Handler;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -12,7 +11,6 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.bumptech.glide.Glide;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -21,12 +19,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import lombok.Getter;
-import my.bandit.FilesDownloader.DownloadFileTask;
-import my.bandit.FilesDownloader.OnFileDownload;
+import my.bandit.Api.Api;
 import my.bandit.Model.Post;
 import my.bandit.Service.MusicService;
 
-public class MainViewModel extends AndroidViewModel implements OnFileDownload {
+public class MainViewModel extends AndroidViewModel {
     final private ExecutorService pool = Executors.newCachedThreadPool();
     @Getter
     private MutableLiveData<Post> currentlyPlayedPost;
@@ -84,29 +81,17 @@ public class MainViewModel extends AndroidViewModel implements OnFileDownload {
             musicService.continuePlaying();
     }
 
-    public void downloadPostImage(final ImageView imageView, Post currentPost) {
+    public void loadPostImage(final ImageView imageView, Post currentPost) {
         Context mContext = contextWeakReference.get();
-        if (mContext != null)
-            DownloadFileTask.getInstance().downloadFile(
-                    currentPost.getPictureDir(), mContext.getFilesDir() + currentPost.getSong().getBandName(),
-                    new OnFileDownload() {
-                        @Override
-                        public void onSuccess(File file) {
-                            Glide.with(mContext).load(file).into(imageView);
-                        }
-
-                        @Override
-                        public void onFailure() {
-                            Toast.makeText(mContext, "Failed to download image.", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-            );
+        if (mContext != null) {
+            Glide.with(mContext).load(Api.getImageSource(currentPost.getPictureDir())).into(imageView);
+        }
     }
 
-    private void startSong(final File song) throws IOException {
+    private void startSong(String songName) throws IOException {
         MusicService musicService = musicServiceLive.getValue();
         if (musicService != null) {
-            musicService.setDataSource(song);
+            musicService.setDataSource(songName);
             musicService.preparePlayer();
             getPlayingState().postValue(true);
         }
@@ -118,11 +103,12 @@ public class MainViewModel extends AndroidViewModel implements OnFileDownload {
         pool.shutdown();
     }
 
-    public void downloadPostSong(Post post) {
-        Context context = contextWeakReference.get();
-        if (context != null) {
-            DownloadFileTask.getInstance().downloadFile(post.getSong().getSongFileDir(),
-                    context.getFilesDir() + post.getSong().getSongName(), this);
+    public void startPostSong(Post post) {
+        try {
+            startSong(post.getSong().getSongFileDir());
+            continueTimer();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -149,7 +135,7 @@ public class MainViewModel extends AndroidViewModel implements OnFileDownload {
 
     private void updateSeekBar() {
         MusicService musicService = musicServiceLive.getValue();
-        if (musicService != null && timerRunning.getValue()) {
+        if (musicService != null && timerRunning.getValue() != null && timerRunning.getValue()) {
             if (musicService.isPrepared()) {
                 barProgress.postValue(musicService.getMediaPlayer().getCurrentPosition());
             }
@@ -158,24 +144,7 @@ public class MainViewModel extends AndroidViewModel implements OnFileDownload {
     }
 
     public void onPostClick(Post post, ImageView imageView) {
-        downloadPostImage(imageView, post);
-        downloadPostSong(post);
-    }
-
-    @Override
-    public void onSuccess(File file) {
-        try {
-            startSong(file);
-            continueTimer();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void onFailure() {
-        Context context = contextWeakReference.get();
-        if (context != null)
-            Toast.makeText(context, "Failed to download song.", Toast.LENGTH_SHORT).show();
+        loadPostImage(imageView, post);
+        startPostSong(post);
     }
 }
