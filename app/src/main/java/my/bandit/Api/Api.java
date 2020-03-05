@@ -40,10 +40,10 @@ public class Api {
     }
 
     public static String getImageSource(String imageName) {
-        return Api.apiSource + "post/file?dir=" + imageName;
+        return Api.apiSource + "post/img?dir=" + imageName;
     }
 
     public static String getSongSource(String songName) {
-        return Api.apiSource + "post/file?dir=" + songName;
+        return Api.apiSource + "post/audio?dir=" + songName;
     }
 }

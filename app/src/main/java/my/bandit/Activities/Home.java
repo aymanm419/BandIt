@@ -49,6 +49,7 @@ public class Home extends Fragment {
             postsAdapter.setPosts(updatedList);
             postsAdapter.notifyDataSetChanged();
         });
+
         mainViewModel.getSongDuration().observe(getViewLifecycleOwner(), integer -> {
             seekBar.setMax(integer);
         });
@@ -61,10 +62,8 @@ public class Home extends Fragment {
         mainViewModel.getPlayingState().observe(getViewLifecycleOwner(), aBoolean -> {
             if (aBoolean) {
                 Glide.with(view.getContext()).load(R.drawable.ic_play_arrow_black_24dp).into(stateImage);
-                mainViewModel.continueTimer();
             } else {
                 Glide.with(view.getContext()).load(R.drawable.ic_pause_black_24dp).into(stateImage);
-                mainViewModel.pauseTimer();
             }
         });
 
@@ -84,8 +83,10 @@ public class Home extends Fragment {
 
     private void attachViewListeners(final View view) {
         stateImage.setOnClickListener(v -> {
-            boolean currentValue = mainViewModel.getPlayingState().getValue();
-            mainViewModel.getPlayingState().setValue(!currentValue);
+            boolean currentValue = !mainViewModel.getPlayingState().getValue();
+            mainViewModel.getPlayingState().setValue(currentValue);
+            if (currentValue) mainViewModel.continueTimer();
+            else mainViewModel.pauseTimer();
         });
         previousImage.setOnClickListener(v -> {
             mainViewModel.playPrevious();

@@ -3,13 +3,14 @@ package my.bandit.Service;
 import android.app.Service;
 import android.content.Intent;
 import android.media.AudioManager;
-import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
 
 import androidx.annotation.Nullable;
 
-import java.io.IOException;
+import com.devbrackets.android.exomedia.AudioPlayer;
+
 import java.lang.ref.WeakReference;
 
 import lombok.Getter;
@@ -20,7 +21,7 @@ import my.bandit.ViewModel.MainViewModel;
 public class MusicService extends Service {
     private final IBinder binder = new LocalBinder();
     @Getter
-    private MediaPlayer mediaPlayer;
+    private AudioPlayer audioPlayer;
     @Setter
     @Getter
     private boolean isPrepared;
@@ -28,15 +29,15 @@ public class MusicService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        mediaPlayer = new MediaPlayer();
-        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        audioPlayer = new AudioPlayer(this);
+        audioPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         Init();
     }
 
     @Override
     public void onDestroy() {
-        mediaPlayer.release();
-        mediaPlayer = null;
+        audioPlayer.release();
+        audioPlayer = null;
         super.onDestroy();
     }
 
@@ -45,39 +46,38 @@ public class MusicService extends Service {
     }
 
     private void Init() {
-        mediaPlayer.setOnPreparedListener(mp -> {
+        audioPlayer.setOnPreparedListener(() -> {
             isPrepared = true;
-            mp.start();
+            audioPlayer.start();
             MainViewModel mainViewModel = viewModelRef.get();
             if (mainViewModel != null)
-                mainViewModel.getSongDuration().postValue(mp.getDuration());
+                mainViewModel.getSongDuration().postValue((int) audioPlayer.getDuration());
         });
     }
 
-    public void setDataSource(String songName) throws IOException {
+    public void setDataSource(String songName) {
         setPrepared(false);
-        mediaPlayer.reset();
-        mediaPlayer.setDataSource(Api.getSongSource(songName));
-
+        audioPlayer.reset();
+        audioPlayer.setDataSource(Uri.parse(Api.getSongSource(songName)));
     }
 
     public void preparePlayer() {
-        mediaPlayer.prepareAsync();
+        audioPlayer.prepareAsync();
     }
 
     public void pausePlaying() {
-        if (isPrepared() && mediaPlayer.isPlaying())
-            mediaPlayer.pause();
+        if (isPrepared() && audioPlayer.isPlaying())
+            audioPlayer.pause();
     }
 
     public void continuePlaying() {
-        if (isPrepared() && !mediaPlayer.isPlaying())
-            mediaPlayer.start();
+        if (isPrepared() && !audioPlayer.isPlaying())
+            audioPlayer.start();
     }
 
     public void seek(int progress) {
         if (isPrepared())
-            mediaPlayer.seekTo(progress);
+            audioPlayer.seekTo(progress);
     }
 
     @Nullable

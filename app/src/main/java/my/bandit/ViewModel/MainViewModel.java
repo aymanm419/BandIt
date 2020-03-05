@@ -11,7 +11,6 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.bumptech.glide.Glide;
 
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,23 +58,23 @@ public class MainViewModel extends AndroidViewModel {
     }
 
     public void moveBar(int pos) {
-        barProgress.setValue(pos);
         MusicService musicService = musicServiceLive.getValue();
+        barProgress.setValue(pos);
         if (musicService != null)
             musicService.seek(pos);
     }
 
     public void pauseTimer() {
-        timerRunning.postValue(false);
-        playingState.postValue(false);
+        timerRunning.setValue(false);
+        playingState.setValue(false);
         MusicService musicService = musicServiceLive.getValue();
         if (musicService != null)
             musicService.pausePlaying();
     }
 
     public void continueTimer() {
-        timerRunning.postValue(true);
-        playingState.postValue(true);
+        timerRunning.setValue(true);
+        playingState.setValue(true);
         MusicService musicService = musicServiceLive.getValue();
         if (musicService != null)
             musicService.continuePlaying();
@@ -88,7 +87,7 @@ public class MainViewModel extends AndroidViewModel {
         }
     }
 
-    private void startSong(String songName) throws IOException {
+    private void startSong(String songName) {
         MusicService musicService = musicServiceLive.getValue();
         if (musicService != null) {
             musicService.setDataSource(songName);
@@ -104,12 +103,8 @@ public class MainViewModel extends AndroidViewModel {
     }
 
     public void startPostSong(Post post) {
-        try {
-            startSong(post.getSong().getSongFileDir());
-            continueTimer();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        startSong(post.getSong().getSongFileDir());
+        continueTimer();
     }
 
     public void playPrevious() {
@@ -119,6 +114,7 @@ public class MainViewModel extends AndroidViewModel {
             if (currentPost > 0)
                 currentPost--;
             getCurrentlyPlayedPost().setValue(getPosts().getValue().get(currentPost));
+            startPostSong(getPosts().getValue().get(currentPost));
         }
     }
 
@@ -130,14 +126,15 @@ public class MainViewModel extends AndroidViewModel {
             if (currentPost + 1 < list.size())
                 currentPost++;
             getCurrentlyPlayedPost().setValue(list.get(currentPost));
+            startPostSong(getPosts().getValue().get(currentPost));
         }
     }
 
     private void updateSeekBar() {
         MusicService musicService = musicServiceLive.getValue();
-        if (musicService != null && timerRunning.getValue() != null && timerRunning.getValue()) {
+        if (musicService != null && timerRunning.getValue()) {
             if (musicService.isPrepared()) {
-                barProgress.postValue(musicService.getMediaPlayer().getCurrentPosition());
+                barProgress.setValue((int) musicService.getAudioPlayer().getCurrentPosition());
             }
         }
         handler.postDelayed(this::updateSeekBar, 250);
