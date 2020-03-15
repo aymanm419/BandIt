@@ -1,13 +1,13 @@
 package my.bandit.ViewHolder;
 
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import lombok.Getter;
 import my.bandit.R;
 
@@ -15,17 +15,14 @@ public class PostViewHolder extends RecyclerView.ViewHolder {
     @Getter
     private TextView postTextView, postAlbumTextView;
     @Getter
-    private ImageView LikeImageView, UnlikeImageView, HeartImageView, albumPicture;
+    private CircleImageView albumPicture;
     @Getter
-    private CardView cardView;
+    private ConstraintLayout constraintLayout;
     public PostViewHolder(@NonNull View itemView) {
         super(itemView);
         postTextView = itemView.findViewById(R.id.PostSongName);
         postAlbumTextView = itemView.findViewById(R.id.PostSingAlbum);
-        LikeImageView = itemView.findViewById(R.id.PostLikeImage);
-        UnlikeImageView = itemView.findViewById(R.id.PostUnlikeImage);
-        HeartImageView = itemView.findViewById(R.id.PostHeartImage);
         albumPicture = itemView.findViewById(R.id.PostAlbumPicture);
-        cardView = itemView.findViewById(R.id.cardView);
+        constraintLayout = itemView.findViewById(R.id.frameLayout);
     }
 }

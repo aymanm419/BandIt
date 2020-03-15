@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:theme="@style/MainTheme"
     tools:context=".Activities.MainActivity">
 
 
@@ -11,11 +12,13 @@
         android:id="@+id/NavView"
         android:layout_width="match_parent"
         android:layout_height="53dp"
-        android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="@+id/fragment"
         android:layout_alignParentEnd="true"
-        android:layout_marginBottom="2dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="-2dp"
+        android:layout_marginBottom="-2dp"
+        android:background="#000000"
         app:menu="@menu/bottom_navigation" />
 
     <fragment
@@ -23,14 +26,14 @@
         android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_above="@+id/NavView"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="0dp"
-        android:layout_marginTop="0dp"
-        android:layout_marginEnd="0dp"
-        android:layout_marginBottom="54dp"
+        android:layout_marginStart="0dip"
+        android:layout_marginTop="0dip"
+        android:layout_marginEnd="0dip"
+        android:layout_marginBottom="0dip"
         app:defaultNavHost="true"
         app:navGraph="@navigation/nav_graph" />
 

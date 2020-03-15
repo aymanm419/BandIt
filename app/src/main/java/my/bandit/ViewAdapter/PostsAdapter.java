@@ -44,7 +44,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostViewHolder> {
         holder.getPostAlbumTextView().setText(currentPost.getSong().getBandName());
         final ImageView imageView = holder.getAlbumPicture();
         Glide.with(mContext).load(Api.getImageSource(currentPost.getPictureDir())).into(imageView);
-        holder.getCardView().setOnClickListener(v -> {
+        holder.getConstraintLayout().setOnClickListener(v -> {
             postClick.onClick(currentPost, position);
         });
     }

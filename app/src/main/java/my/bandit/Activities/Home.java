@@ -1,5 +1,6 @@
 package my.bandit.Activities;
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,8 +12,10 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -35,7 +38,7 @@ public class Home extends Fragment {
     private PostsAdapter postsAdapter;
     private RecyclerView postsView;
     private SeekBar seekBar;
-    private ImageView stateImage, previousImage, nextImage;
+    private ImageView stateImage;
     private ImageView currentSongImage;
     private SwipeRefreshLayout swipeRefreshLayout;
     private TextView songName, bandName;
@@ -61,9 +64,9 @@ public class Home extends Fragment {
         });
         mainViewModel.getPlayingState().observe(getViewLifecycleOwner(), aBoolean -> {
             if (aBoolean) {
-                Glide.with(view.getContext()).load(R.drawable.ic_play_arrow_black_24dp).into(stateImage);
+                Glide.with(view.getContext()).load(R.drawable.ic_play_arrow_white_24dp).into(stateImage);
             } else {
-                Glide.with(view.getContext()).load(R.drawable.ic_pause_black_24dp).into(stateImage);
+                Glide.with(view.getContext()).load(R.drawable.ic_pause_white_24dp).into(stateImage);
             }
         });
 
@@ -77,8 +80,6 @@ public class Home extends Fragment {
         currentSongImage = view.findViewById(R.id.currentPlayingImage);
         songName = view.findViewById(R.id.currentPlayingSong);
         bandName = view.findViewById(R.id.currentPlayingBand);
-        previousImage = view.findViewById(R.id.previousImage);
-        nextImage = view.findViewById(R.id.nextImage);
     }
 
     private void attachViewListeners(final View view) {
@@ -87,12 +88,6 @@ public class Home extends Fragment {
             mainViewModel.getPlayingState().setValue(currentValue);
             if (currentValue) mainViewModel.continueTimer();
             else mainViewModel.pauseTimer();
-        });
-        previousImage.setOnClickListener(v -> {
-            mainViewModel.playPrevious();
-        });
-        nextImage.setOnClickListener(v -> {
-            mainViewModel.playNext();
         });
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -121,6 +116,8 @@ public class Home extends Fragment {
             PostsLoader postsLoader = new PostsLoader(homeViewModel, swipeRefreshLayout, view.getContext());
             postsLoader.loadPosts(1, 10);
         });
+        PostsLoader postsLoader = new PostsLoader(homeViewModel, swipeRefreshLayout, view.getContext());
+        postsLoader.loadPosts(1, 10);
     }
 
 
@@ -161,7 +158,11 @@ public class Home extends Fragment {
         initVariables();
         InitObservers(getView());
         attachViewListeners(getView());
-
+        DividerItemDecoration horizontalDecoration = new DividerItemDecoration(postsView.getContext(),
+                DividerItemDecoration.VERTICAL);
+        Drawable horizontalDivider = ContextCompat.getDrawable(getView().getContext(), R.drawable.horizontal_divider);
+        horizontalDecoration.setDrawable(horizontalDivider);
+        postsView.addItemDecoration(horizontalDecoration);
     }
 
 }
