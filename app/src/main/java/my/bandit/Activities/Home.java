@@ -2,13 +2,9 @@ package my.bandit.Activities;
 
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.SeekBar;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,11 +16,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.bumptech.glide.Glide;
-
 import java.util.ArrayList;
+import java.util.Objects;
 
-import my.bandit.Model.Post;
 import my.bandit.R;
 import my.bandit.Repository.PostsLoader;
 import my.bandit.ViewAdapter.PostsAdapter;
@@ -34,103 +28,36 @@ import my.bandit.ViewModel.MainViewModel;
 public class Home extends Fragment {
     private HomeViewModel homeViewModel;
     private MainViewModel mainViewModel;
-    private ArrayList<Post> posts;
     private PostsAdapter postsAdapter;
     private RecyclerView postsView;
-    private SeekBar seekBar;
-    private ImageView stateImage;
-    private ImageView currentSongImage;
     private SwipeRefreshLayout swipeRefreshLayout;
-    private TextView songName, bandName;
+    private PostsLoader postsLoader;
 
-    public static Home newInstance() {
-        return new Home();
-    }
-
-    private void InitObservers(final View view) {
+    private void InitObservers() {
         homeViewModel.getPosts().observe(getViewLifecycleOwner(), updatedList -> {
             postsAdapter.setPosts(updatedList);
             postsAdapter.notifyDataSetChanged();
         });
-
-        mainViewModel.getSongDuration().observe(getViewLifecycleOwner(), integer -> {
-            seekBar.setMax(integer);
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            loadPosts(1, 10);
         });
-        mainViewModel.getCurrentlyPlayedPost().observe(getViewLifecycleOwner(), post -> {
-            Log.i("Home", "Played again");
-            mainViewModel.loadPostImage(currentSongImage, post);
-            songName.setText(post.getSong().getSongName());
-            bandName.setText(post.getSong().getBandName());
-        });
-        mainViewModel.getPlayingState().observe(getViewLifecycleOwner(), aBoolean -> {
-            if (aBoolean) {
-                Glide.with(view.getContext()).load(R.drawable.ic_play_arrow_white_24dp).into(stateImage);
-            } else {
-                Glide.with(view.getContext()).load(R.drawable.ic_pause_white_24dp).into(stateImage);
-            }
-        });
-
     }
 
     private void AttachViews(final View view) {
         postsView = view.findViewById(R.id.recyclerView);
-        seekBar = view.findViewById(R.id.seekBar);
-        stateImage = view.findViewById(R.id.stateImage);
         swipeRefreshLayout = view.findViewById(R.id.swiperefresh);
-        currentSongImage = view.findViewById(R.id.currentPlayingImage);
-        songName = view.findViewById(R.id.currentPlayingSong);
-        bandName = view.findViewById(R.id.currentPlayingBand);
     }
 
-    private void attachViewListeners(final View view) {
-        stateImage.setOnClickListener(v -> {
-            boolean currentValue = !mainViewModel.getPlayingState().getValue();
-            mainViewModel.getPlayingState().setValue(currentValue);
-            if (currentValue) mainViewModel.continueTimer();
-            else mainViewModel.pauseTimer();
-        });
-        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (fromUser) {
-                    mainViewModel.moveBar(progress);
-                    mainViewModel.continueTimer();
-                }
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-                mainViewModel.pauseTimer();
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-
-            }
-        });
-        mainViewModel.getBarProgress().observe(getViewLifecycleOwner(), integer -> {
-            seekBar.setProgress(integer);
-        });
-        swipeRefreshLayout.setOnRefreshListener(() -> {
-            PostsLoader postsLoader = new PostsLoader(homeViewModel, swipeRefreshLayout, view.getContext());
-            postsLoader.loadPosts(1, 10);
-        });
-        PostsLoader postsLoader = new PostsLoader(homeViewModel, swipeRefreshLayout, view.getContext());
-        postsLoader.loadPosts(1, 10);
+    private void loadPosts(int startPost, int endPost) {
+        postsLoader.loadPosts(startPost, endPost);
     }
-
 
     private void initVariables() {
-        posts = new ArrayList<>();
-        homeViewModel = new ViewModelProvider(getActivity()).get(HomeViewModel.class);
+        homeViewModel = new ViewModelProvider(Objects.requireNonNull(getActivity())).get(HomeViewModel.class);
         mainViewModel = new ViewModelProvider(getActivity()).get(MainViewModel.class);
-        postsAdapter = new PostsAdapter(getContext(), posts, (post, position) -> {
-            mainViewModel.getCurrentlyPlayedPost().setValue(post);
-            mainViewModel.getCurrentlyPlayedPostIndex().setValue(position);
-            mainViewModel.getPosts().setValue(homeViewModel.getPosts().getValue());
-            mainViewModel.onPostClick(post, currentSongImage);
-        });
+        postsLoader = new PostsLoader(homeViewModel, swipeRefreshLayout, getContext(), mainViewModel);
+        postsAdapter = new PostsAdapter(getContext(), new ArrayList<>(), (post, position) ->
+                mainViewModel.getCurrentlyPlayedPost().setValue(post));
         postsView.setLayoutManager(new LinearLayoutManager(getContext()));
         postsView.setAdapter(postsAdapter);
     }
@@ -154,15 +81,17 @@ public class Home extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        AttachViews(getView());
+        AttachViews(Objects.requireNonNull(getView()));
         initVariables();
-        InitObservers(getView());
-        attachViewListeners(getView());
+        InitObservers();
         DividerItemDecoration horizontalDecoration = new DividerItemDecoration(postsView.getContext(),
                 DividerItemDecoration.VERTICAL);
         Drawable horizontalDivider = ContextCompat.getDrawable(getView().getContext(), R.drawable.horizontal_divider);
-        horizontalDecoration.setDrawable(horizontalDivider);
-        postsView.addItemDecoration(horizontalDecoration);
+        if (horizontalDivider != null) {
+            horizontalDecoration.setDrawable(horizontalDivider);
+            postsView.addItemDecoration(horizontalDecoration);
+        }
+        loadPosts(1, 10);
     }
 
 }

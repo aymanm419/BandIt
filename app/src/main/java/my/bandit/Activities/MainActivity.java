@@ -10,6 +10,9 @@ import android.os.IBinder;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.ImageView;
+import android.widget.SeekBar;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
@@ -17,6 +20,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import my.bandit.Data.LoginDataSource;
@@ -27,7 +31,6 @@ import my.bandit.Service.MusicService;
 import my.bandit.ViewModel.MainViewModel;
 
 public class MainActivity extends AppCompatActivity {
-    private MainViewModel mainViewModel;
     private ServiceConnection connection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName className,
@@ -42,6 +45,76 @@ public class MainActivity extends AppCompatActivity {
             mainViewModel.getMusicServiceLive().setValue(null);
         }
     };
+
+    private MainViewModel mainViewModel;
+    private SeekBar seekBar;
+    private ImageView stateImage;
+    private ImageView currentSongImage;
+    private TextView songName, bandName;
+
+    private void InitObservers() {
+        mainViewModel.getSongDuration().observe(this, integer -> {
+            seekBar.setMax(integer);
+        });
+        mainViewModel.getCurrentlyPlayedPost().observe(this, post -> {
+            mainViewModel.loadPostImage(currentSongImage, post);
+            mainViewModel.onPostClick(post, currentSongImage);
+            songName.setText(post.getSong().getSongName());
+            bandName.setText(post.getSong().getBandName());
+        });
+        mainViewModel.getBarProgress().observe(this, integer -> {
+            seekBar.setProgress(integer);
+        });
+        mainViewModel.getPlayingState().observe(this, aBoolean -> {
+            if (aBoolean) {
+                Glide.with(getApplicationContext()).load(R.drawable.ic_play_arrow_white_24dp).into(stateImage);
+            } else {
+                Glide.with(getApplicationContext()).load(R.drawable.ic_pause_white_24dp).into(stateImage);
+            }
+        });
+
+    }
+
+    private void AttachViews() {
+        seekBar = findViewById(R.id.seekBar);
+        stateImage = findViewById(R.id.stateImage);
+        currentSongImage = findViewById(R.id.currentPlayingImage);
+        songName = findViewById(R.id.currentPlayingSong);
+        bandName = findViewById(R.id.currentPlayingBand);
+    }
+
+    private void attachViewListeners() {
+        stateImage.setOnClickListener(v -> {
+            boolean currentValue = !mainViewModel.getPlayingState().getValue();
+            mainViewModel.getPlayingState().setValue(currentValue);
+            if (currentValue)
+                mainViewModel.continueTimer();
+            else
+                mainViewModel.pauseTimer();
+        });
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser) {
+                    mainViewModel.moveBar(progress);
+                    mainViewModel.continueTimer();
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                mainViewModel.pauseTimer();
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+
+            }
+        });
+    }
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,6 +126,9 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(getApplicationContext(), MusicService.class);
         getApplicationContext().startService(intent);
         getApplicationContext().bindService(intent, connection, Context.BIND_AUTO_CREATE);
+        AttachViews();
+        InitObservers();
+        attachViewListeners();
     }
 
     @Override
@@ -63,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void logout() {
-        SharedPreferences preferences = getSharedPreferences("Login data",Context.MODE_PRIVATE);
+        SharedPreferences preferences = getSharedPreferences("Login data", Context.MODE_PRIVATE);
         preferences.edit().clear().apply();
         LoginRepository.getInstance(new LoginDataSource()).logout();
         Intent login = new Intent(getApplicationContext(), LoginActivity.class);

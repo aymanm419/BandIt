@@ -12,10 +12,12 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.Setter;
 import my.bandit.Api.Api;
 import my.bandit.Api.ApiResponse;
 import my.bandit.Model.Post;
 import my.bandit.ViewModel.HomeViewModel;
+import my.bandit.ViewModel.MainViewModel;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -24,11 +26,16 @@ public class PostsLoader implements Callback<JsonObject> {
     private HomeViewModel homeViewModel;
     private WeakReference<SwipeRefreshLayout> swipeRefreshLayoutRef;
     private WeakReference<Context> contextWeakReference;
+    private MainViewModel mainViewModel;
+    @Setter
+    private boolean isUpdate = false;
 
-    public PostsLoader(HomeViewModel homeViewModel, SwipeRefreshLayout swipeRefreshLayout, Context context) {
+    public PostsLoader(HomeViewModel homeViewModel, SwipeRefreshLayout swipeRefreshLayout, Context context,
+                       MainViewModel mainViewModel) {
         this.homeViewModel = homeViewModel;
         this.swipeRefreshLayoutRef = new WeakReference<>(swipeRefreshLayout);
         this.contextWeakReference = new WeakReference<>(context);
+        this.mainViewModel = mainViewModel;
     }
 
     private void refreshLayout() {
@@ -59,6 +66,10 @@ public class PostsLoader implements Callback<JsonObject> {
         ArrayList<Post> posts = Api.getInstance().
                 getGson().fromJson(response.body().get("data"), new TypeToken<List<Post>>() {
         }.getType());
+        if (posts.size() > 0 && isUpdate) {
+            mainViewModel.getCurrentlyPlayedPost().setValue(posts.get(0));
+            mainViewModel.getCurrentlyPlayedPostIndex().setValue(0);
+        }
         postValue(posts);
     }
 
