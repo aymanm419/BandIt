@@ -15,7 +15,7 @@
         <service android:name="my.bandit.Service.MusicService"></service>
 
         <activity
-            android:name=".Login.LoginActivity"
+            android:name="my.bandit.Login.LoginActivity"
             android:label="Bandit"
             android:theme="@style/AppTheme.FullScreen.NoActionBar">
         </activity>
