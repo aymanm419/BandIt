@@ -78,12 +78,13 @@
         android:text="Sign Up"
         android:textColor="#AEC5C2C2"
         android:textSize="16sp" />
+
     <CheckBox
         android:id="@+id/Remember"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
         android:layout_marginTop="200dip"
-        android:layout_marginStart="140dp"
         android:buttonTint="#FFFFFF"
         android:text="Remember me"
         android:textColor="#FFFFFF" />
