@@ -13,18 +13,17 @@
         android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_above="@id/currentlyPlaying"
         app:defaultNavHost="true"
-        app:navGraph="@navigation/nav_graph"
-        android:layout_above="@id/currentlyPlaying"/>
+        app:navGraph="@navigation/nav_graph" />
 
     <LinearLayout
         android:id="@+id/currentlyPlaying"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#E60E0E0E"
-        android:orientation="vertical"
         android:layout_above="@id/NavView"
-        >
+        android:background="#E60E0E0E"
+        android:orientation="vertical">
 
         <SeekBar
             android:id="@+id/seekBar"
@@ -48,7 +47,7 @@
                 app:civ_border_width="2dp" />
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:orientation="vertical">
@@ -57,7 +56,6 @@
                     android:id="@+id/currentPlayingSong"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/seekBar"
                     android:layout_marginStart="10dp"
                     android:layout_marginTop="20dp"
                     android:text="Nothing is being played"
@@ -67,7 +65,6 @@
                     android:id="@+id/currentPlayingBand"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/currentPlayingSong"
                     android:layout_marginStart="10dp"
                     android:layout_marginTop="3dp"
                     android:text="Band Name"
