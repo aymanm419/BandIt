@@ -7,22 +7,24 @@
     android:theme="@style/MainTheme"
     tools:context=".Activities.MainActivity">
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/NavView"
+
+    <fragment
+        android:id="@+id/fragment"
+        android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/currentlyPlaying"
-        android:layout_alignParentBottom="true"
-        android:background="#000000"
-        app:menu="@menu/bottom_navigation" />
+        app:defaultNavHost="true"
+        app:navGraph="@navigation/nav_graph"
+        android:layout_above="@id/currentlyPlaying"/>
 
     <LinearLayout
         android:id="@+id/currentlyPlaying"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/fragment"
         android:background="#E60E0E0E"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_above="@id/NavView"
+        >
 
         <SeekBar
             android:id="@+id/seekBar"
@@ -84,11 +86,12 @@
         </LinearLayout>
     </LinearLayout>
 
-    <fragment
-        android:id="@+id/fragment"
-        android:name="androidx.navigation.fragment.NavHostFragment"
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/NavView"
         android:layout_width="match_parent"
-        android:layout_height="560dp"
-        app:defaultNavHost="true"
-        app:navGraph="@navigation/nav_graph" />
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="#000000"
+        app:menu="@menu/bottom_navigation" />
+
 </RelativeLayout>
