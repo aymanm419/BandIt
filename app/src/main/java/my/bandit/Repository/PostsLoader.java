@@ -67,8 +67,7 @@ public class PostsLoader implements Callback<JsonObject> {
                 getGson().fromJson(response.body().get("data"), new TypeToken<List<Post>>() {
         }.getType());
         if (posts.size() > 0 && isUpdate) {
-            mainViewModel.getCurrentlyPlayedPost().setValue(posts.get(0));
-            mainViewModel.getCurrentlyPlayedPostIndex().setValue(0);
+            mainViewModel.getMusicService().getCurrentlyPlayedPost().setValue(posts.get(0));
         }
         postValue(posts);
     }

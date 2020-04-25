@@ -7,10 +7,10 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -24,6 +24,7 @@ import androidx.navigation.ui.NavigationUI;
 import com.bumptech.glide.Glide;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import my.bandit.Api.Api;
 import my.bandit.Data.LoginDataSource;
 import my.bandit.Login.LoginActivity;
 import my.bandit.R;
@@ -37,13 +38,14 @@ public class MainActivity extends AppCompatActivity {
         public void onServiceConnected(ComponentName className,
                                        IBinder service) {
             MusicService.LocalBinder binder = (MusicService.LocalBinder) service;
-            mainViewModel.getMusicServiceLive().setValue(binder.getService());
-            binder.getService().setViewModelRef(mainViewModel);
+            mainViewModel.setMusicService(binder.getService());
+            InitObservers();
         }
 
         @Override
         public void onServiceDisconnected(ComponentName arg0) {
-            mainViewModel.getMusicServiceLive().setValue(null);
+            Log.i("Service NOT CONNECTED", "BAD SERVICe");
+            mainViewModel.setMusicService(null);
         }
     };
 
@@ -52,21 +54,23 @@ public class MainActivity extends AppCompatActivity {
     private ImageView stateImage;
     private ImageView currentSongImage;
     private TextView songName, bandName;
-
     private void InitObservers() {
-        mainViewModel.getSongDuration().observe(this, integer -> {
+        Log.i("Info", String.valueOf((mainViewModel.getMusicService() == null)));
+        mainViewModel.getMusicService().getSongDuration().observe(this, integer -> {
             seekBar.setMax(integer);
         });
-        mainViewModel.getCurrentlyPlayedPost().observe(this, post -> {
-            mainViewModel.loadPostImage(currentSongImage, post);
-            mainViewModel.onPostClick(post, currentSongImage);
+        mainViewModel.getMusicService().getCurrentlyPlayedPost().observe(this, post -> {
+            Glide.with(getApplicationContext())
+                    .load(Api.getImageSource(post.getPictureDir()))
+                    .into(currentSongImage);
+            mainViewModel.startPostSong(post);
             songName.setText(post.getSong().getSongName());
             bandName.setText(post.getSong().getBandName());
         });
-        mainViewModel.getBarProgress().observe(this, integer -> {
+        mainViewModel.getMusicService().getBarProgress().observe(this, integer -> {
             seekBar.setProgress(integer);
         });
-        mainViewModel.getPlayingState().observe(this, aBoolean -> {
+        mainViewModel.getMusicService().getIsPlaying().observe(this, aBoolean -> {
             if (aBoolean) {
                 Glide.with(getApplicationContext()).load(R.drawable.ic_play_arrow_white_24dp).into(stateImage);
             } else {
@@ -85,16 +89,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void attachViewListeners() {
-        currentSongImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), NowPlaying.class);
-                startActivity(intent);
-            }
+        currentSongImage.setOnClickListener(v -> {
+            Intent intent = new Intent(getApplicationContext(), NowPlaying.class);
+            startActivity(intent);
         });
         stateImage.setOnClickListener(v -> {
-            boolean currentValue = !mainViewModel.getPlayingState().getValue();
-            mainViewModel.getPlayingState().setValue(currentValue);
+            boolean currentValue = !mainViewModel.getMusicService().getIsPlaying().getValue();
+            mainViewModel.getMusicService().getIsPlaying().setValue(currentValue);
             if (currentValue)
                 mainViewModel.continueTimer();
             else
@@ -135,7 +136,6 @@ public class MainActivity extends AppCompatActivity {
         getApplicationContext().startService(intent);
         getApplicationContext().bindService(intent, connection, Context.BIND_AUTO_CREATE);
         AttachViews();
-        InitObservers();
         attachViewListeners();
     }
 

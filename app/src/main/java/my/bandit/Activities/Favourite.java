@@ -1,7 +1,12 @@
 package my.bandit.Activities;
 
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +24,7 @@ import java.util.ArrayList;
 
 import my.bandit.Model.Post;
 import my.bandit.R;
+import my.bandit.Service.MusicService;
 import my.bandit.ViewAdapter.PostsAdapter;
 import my.bandit.ViewModel.FavouriteViewModel;
 import my.bandit.ViewModel.MainViewModel;
@@ -29,6 +35,19 @@ public class Favourite extends Fragment {
     private RecyclerView postsView;
     private ArrayList<Post> posts;
     private PostsAdapter postsAdaper;
+    private MusicService musicService;
+    private ServiceConnection connection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            MusicService.LocalBinder binder = (MusicService.LocalBinder) service;
+            mainViewModel.setMusicService(binder.getService());
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+        }
+    };
 
     public static Favourite newInstance() {
         return new Favourite();
@@ -40,18 +59,11 @@ public class Favourite extends Fragment {
         return inflater.inflate(R.layout.favourite_fragment, container, false);
     }
 
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        mViewModel = new ViewModelProvider(this).get(FavouriteViewModel.class);
-        mainViewModel = new ViewModelProvider(getActivity()).get(MainViewModel.class);
-        mViewModel.fetchPosts();
+    public void Init() {
         postsView = getView().findViewById(R.id.favList);
         posts = mViewModel.getPosts().getValue();
         postsAdaper = new PostsAdapter(getContext(), posts, (post, integer) -> {
-            mainViewModel.getCurrentlyPlayedPost().setValue(post);
-            mainViewModel.getCurrentlyPlayedPostIndex().setValue(integer);
-            mainViewModel.getPosts().setValue(mViewModel.getPosts().getValue());
+            musicService.getCurrentlyPlayedPost().setValue(post);
             mainViewModel.startPostSong(post);
 
         });
@@ -68,6 +80,18 @@ public class Favourite extends Fragment {
         });
         postsView.setLayoutManager(new LinearLayoutManager(getView().getContext()));
         postsView.setAdapter(postsAdaper);
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        mViewModel = new ViewModelProvider(this).get(FavouriteViewModel.class);
+        mainViewModel = new ViewModelProvider(getActivity()).get(MainViewModel.class);
+        Intent intent = new Intent(getContext(), MusicService.class);
+        getContext().startService(intent);
+        getContext().bindService(intent, connection, Context.BIND_AUTO_CREATE);
+        mViewModel.fetchPosts();
+        Init();
     }
 
 }
