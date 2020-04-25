@@ -29,5 +29,17 @@
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowActionBar">false</item>
         <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentTransitions">true</item>
+    </style>
+
+    <style name="SlideAnimation" parent="android:style/Animation.Activity">
+        <item name="android:activityOpenEnterAnimation">@anim/activity_slide_from_bottom</item>
+        <item name="android:activityOpenExitAnimation">@anim/activity_stay</item>
+        <item name="android:activityCloseEnterAnimation">@anim/activity_stay</item>
+        <item name="android:activityCloseExitAnimation">@anim/activity_slide_to_bottom</item>
+    </style>
+
+    <style name="Theme.SlideAnimWindow" parent="AppTheme">
+        <item name="android:windowAnimationStyle">@style/SlideAnimation</item>
     </style>
 </resources>

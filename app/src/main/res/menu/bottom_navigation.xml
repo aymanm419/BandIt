@@ -9,10 +9,6 @@
         android:icon="@drawable/ic_favorite_black_24dp"
         android:title="Favourites" />
     <item
-        android:id="@+id/nowPlaying"
-        android:icon="@drawable/ic_play_arrow_white_24dp"
-        android:title="Now Playing" />
-    <item
         android:id="@+id/search"
         android:icon="@drawable/ic_search_white_24dp"
         android:title="Search" />

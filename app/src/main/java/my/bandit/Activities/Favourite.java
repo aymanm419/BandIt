@@ -1,5 +1,6 @@
 package my.bandit.Activities;
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,8 +8,10 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -52,6 +55,13 @@ public class Favourite extends Fragment {
             mainViewModel.startPostSong(post);
 
         });
+        DividerItemDecoration horizontalDecoration = new DividerItemDecoration(postsView.getContext(),
+                DividerItemDecoration.VERTICAL);
+        Drawable horizontalDivider = ContextCompat.getDrawable(getView().getContext(), R.drawable.horizontal_divider);
+        if (horizontalDivider != null) {
+            horizontalDecoration.setDrawable(horizontalDivider);
+            postsView.addItemDecoration(horizontalDecoration);
+        }
         mViewModel.getPosts().observe(getViewLifecycleOwner(), updatedList -> {
             postsAdaper.setPosts(updatedList);
             postsAdaper.notifyDataSetChanged();

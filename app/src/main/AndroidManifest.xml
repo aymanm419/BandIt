@@ -12,10 +12,16 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:usesCleartextTraffic="true">
-        <service android:name="my.bandit.Service.MusicService"></service>
+        <activity
+            android:name=".Activities.NowPlaying"
+            android:theme="@style/Theme.SlideAnimWindow">
+
+        </activity>
+
+        <service android:name=".Service.MusicService" />
 
         <activity
-            android:name="my.bandit.Login.LoginActivity"
+            android:name=".Login.LoginActivity"
             android:label="Bandit"
             android:theme="@style/AppTheme.FullScreen.NoActionBar">
             <intent-filter>
@@ -26,10 +32,7 @@
         </activity>
         <activity
             android:name=".Activities.MainActivity"
-            android:theme="@style/MainTheme">
-
-        </activity>
-
+            android:theme="@style/MainTheme"></activity>
     </application>
 
 </manifest>

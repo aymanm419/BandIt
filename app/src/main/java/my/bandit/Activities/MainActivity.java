@@ -10,6 +10,7 @@ import android.os.IBinder;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -84,6 +85,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void attachViewListeners() {
+        currentSongImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), NowPlaying.class);
+                startActivity(intent);
+            }
+        });
         stateImage.setOnClickListener(v -> {
             boolean currentValue = !mainViewModel.getPlayingState().getValue();
             mainViewModel.getPlayingState().setValue(currentValue);
@@ -130,6 +138,7 @@ public class MainActivity extends AppCompatActivity {
         InitObservers();
         attachViewListeners();
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

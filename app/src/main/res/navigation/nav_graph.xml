@@ -13,9 +13,6 @@
             android:id="@+id/action_home2_to_favourite"
             app:destination="@id/favourite" />
         <action
-            android:id="@+id/action_home2_to_nowPlaying"
-            app:destination="@id/nowPlaying" />
-        <action
             android:id="@+id/action_home_to_search"
             app:destination="@id/search" />
     </fragment>
@@ -24,11 +21,6 @@
         android:name="my.bandit.Activities.Favourite"
         android:label="favourite_fragment"
         tools:layout="@layout/favourite_fragment" />
-    <fragment
-        android:id="@+id/nowPlaying"
-        android:name="my.bandit.Activities.NowPlaying"
-        android:label="now_playing_fragment"
-        tools:layout="@layout/now_playing_fragment" />
     <fragment
         android:id="@+id/search"
         android:name="my.bandit.Activities.Search"
