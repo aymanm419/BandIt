@@ -44,7 +44,6 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onServiceDisconnected(ComponentName arg0) {
-            Log.i("Service NOT CONNECTED", "BAD SERVICe");
             mainViewModel.setMusicService(null);
         }
     };
@@ -63,7 +62,6 @@ public class MainActivity extends AppCompatActivity {
             Glide.with(getApplicationContext())
                     .load(Api.getImageSource(post.getPictureDir()))
                     .into(currentSongImage);
-            mainViewModel.startPostSong(post);
             songName.setText(post.getSong().getSongName());
             bandName.setText(post.getSong().getBandName());
         });

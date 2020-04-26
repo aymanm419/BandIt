@@ -57,7 +57,10 @@ public class Home extends Fragment {
         mainViewModel = new ViewModelProvider(getActivity()).get(MainViewModel.class);
         postsLoader = new PostsLoader(homeViewModel, swipeRefreshLayout, getContext(), mainViewModel);
         postsAdapter = new PostsAdapter(getContext(), new ArrayList<>(), (post, position) ->
-                mainViewModel.getMusicService().getCurrentlyPlayedPost().setValue(post));
+        {
+            mainViewModel.getMusicService().getCurrentlyPlayedPost().setValue(post);
+            mainViewModel.startPostSong(post);
+        });
         postsView.setLayoutManager(new LinearLayoutManager(getContext()));
         postsView.setAdapter(postsAdapter);
     }

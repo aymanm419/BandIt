@@ -35,7 +35,6 @@ public class MainViewModel extends AndroidViewModel {
     }
 
     private void startSong(String songName) {
-
         musicService.setDataSource(songName);
         musicService.preparePlayer();
         musicService.getIsPlaying().setValue(true);

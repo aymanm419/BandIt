@@ -1,7 +1,5 @@
 package my.bandit.ViewModel;
 
-import android.util.Log;
-
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
@@ -17,8 +15,8 @@ public class FavouriteViewModel extends ViewModel {
     private LoggedInUser user = LoginRepository.getInstance(new LoginDataSource()).getUser();
 
     public void fetchPosts() {
-        Log.i("Database", "Fetching favourite posts");
         posts.setValue(user.getFavourites());
+
     }
 
     public MutableLiveData<ArrayList<Post>> getPosts() {
