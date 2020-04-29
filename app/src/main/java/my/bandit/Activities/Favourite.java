@@ -35,7 +35,6 @@ public class Favourite extends Fragment {
     private RecyclerView postsView;
     private ArrayList<Post> posts;
     private PostsAdapter postsAdaper;
-    private MusicService musicService;
     private ServiceConnection connection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName className,
@@ -63,8 +62,9 @@ public class Favourite extends Fragment {
         postsView = getView().findViewById(R.id.favList);
         posts = mViewModel.getPosts().getValue();
         postsAdaper = new PostsAdapter(getContext(), posts, (post, integer) -> {
-            musicService.getCurrentlyPlayedPost().setValue(post);
-            mainViewModel.startPostSong(post);
+            mainViewModel.getMusicService().setPlayingPostIndex(integer);
+            mainViewModel.getMusicService().setPlayingPostsQueue(mViewModel.getPosts().getValue());
+            mainViewModel.getMusicService().startPostSong(post);
 
         });
         DividerItemDecoration horizontalDecoration = new DividerItemDecoration(postsView.getContext(),

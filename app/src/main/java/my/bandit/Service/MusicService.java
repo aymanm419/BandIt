@@ -13,6 +13,8 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.devbrackets.android.exomedia.AudioPlayer;
 
+import java.util.List;
+
 import lombok.Getter;
 import lombok.Setter;
 import my.bandit.Api.Api;
@@ -29,11 +31,16 @@ public class MusicService extends Service {
     @Getter
     private MutableLiveData<Boolean> isPlaying;
     @Getter
-    private MutableLiveData<Post> currentlyPlayedPost;
+    private MutableLiveData<Post> playingPost;
     @Getter
     private MutableLiveData<Integer> songDuration, barProgress;
     private Handler handler;
-
+    @Setter
+    @Getter
+    private int playingPostIndex;
+    @Setter
+    @Getter
+    private List<Post> playingPostsQueue;
     @Override
     public void onCreate() {
         super.onCreate();
@@ -42,7 +49,7 @@ public class MusicService extends Service {
         Init();
         handler = new Handler();
         isPlaying = new MutableLiveData<>();
-        currentlyPlayedPost = new MutableLiveData<>();
+        playingPost = new MutableLiveData<>();
         songDuration = new MutableLiveData<>();
         barProgress = new MutableLiveData<>();
         updateSeekBar();
@@ -55,6 +62,24 @@ public class MusicService extends Service {
         super.onDestroy();
     }
 
+    public void moveBar(int pos) {
+        getBarProgress().setValue(pos);
+        seek(pos);
+    }
+
+    public void pauseTimer() {
+        pausePlaying();
+    }
+
+    public void continueTimer() {
+        continuePlaying();
+    }
+
+    private void startSong(String songName) {
+        setDataSource(songName);
+        preparePlayer();
+        getIsPlaying().setValue(true);
+    }
     private void Init() {
         audioPlayer.setOnPreparedListener(() -> {
             isPrepared = true;
@@ -93,6 +118,11 @@ public class MusicService extends Service {
             audioPlayer.seekTo(progress);
     }
 
+    public void startPostSong(Post post) {
+        getPlayingPost().setValue(post);
+        startSong(post.getSong().getSongFileDir());
+        continueTimer();
+    }
     private void updateSeekBar() {
         if (isPrepared() && getIsPlaying().getValue()) {
             barProgress.setValue((int) getAudioPlayer().getCurrentPosition());
@@ -100,6 +130,19 @@ public class MusicService extends Service {
         handler.postDelayed(this::updateSeekBar, 250);
     }
 
+    public void playNext() {
+        if (playingPostIndex + 1 < playingPostsQueue.size()) {
+            playingPostIndex++;
+            startPostSong(playingPostsQueue.get(playingPostIndex));
+        }
+    }
+
+    public void playPrevious() {
+        if (playingPostIndex - 1 >= 0) {
+            playingPostIndex--;
+            startPostSong(playingPostsQueue.get(playingPostIndex));
+        }
+    }
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {

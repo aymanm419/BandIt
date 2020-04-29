@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
         mainViewModel.getMusicService().getSongDuration().observe(this, integer -> {
             seekBar.setMax(integer);
         });
-        mainViewModel.getMusicService().getCurrentlyPlayedPost().observe(this, post -> {
+        mainViewModel.getMusicService().getPlayingPost().observe(this, post -> {
             Glide.with(getApplicationContext())
                     .load(Api.getImageSource(post.getPictureDir()))
                     .into(currentSongImage);
@@ -95,22 +95,22 @@ public class MainActivity extends AppCompatActivity {
             boolean currentValue = !mainViewModel.getMusicService().getIsPlaying().getValue();
             mainViewModel.getMusicService().getIsPlaying().setValue(currentValue);
             if (currentValue)
-                mainViewModel.continueTimer();
+                mainViewModel.getMusicService().continueTimer();
             else
-                mainViewModel.pauseTimer();
+                mainViewModel.getMusicService().pauseTimer();
         });
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (fromUser) {
-                    mainViewModel.moveBar(progress);
-                    mainViewModel.continueTimer();
+                    mainViewModel.getMusicService().moveBar(progress);
+                    mainViewModel.getMusicService().continueTimer();
                 }
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-                mainViewModel.pauseTimer();
+                mainViewModel.getMusicService().pauseTimer();
             }
 
             @Override

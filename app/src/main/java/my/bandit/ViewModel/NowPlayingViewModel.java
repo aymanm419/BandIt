@@ -23,36 +23,14 @@ public class NowPlayingViewModel extends ViewModel {
     @Getter
     @Setter
     private MusicService musicService;
-    LoggedInUser user = LoginRepository.getInstance(new LoginDataSource()).getUser();
-    Post post;
+    private LoggedInUser user = LoginRepository.getInstance(new LoginDataSource()).getUser();
+    private Post post;
 
-    public void moveBar(int pos) {
-        musicService.getBarProgress().setValue(pos);
-        musicService.seek(pos);
+    public NowPlayingViewModel() {
     }
-
-    public void pauseTimer() {
-        musicService.pausePlaying();
-    }
-
-    public void continueTimer() {
-        musicService.continuePlaying();
-    }
-
-    private void startSong(String songName) {
-        musicService.setDataSource(songName);
-        musicService.preparePlayer();
-        musicService.getIsPlaying().setValue(true);
-    }
-
     @Override
     protected void onCleared() {
         super.onCleared();
-    }
-
-    public void startPostSong(Post post) {
-        startSong(post.getSong().getSongFileDir());
-        continueTimer();
     }
     public void fetchNewData(Post post) {
         if (post != null) {

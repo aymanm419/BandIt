@@ -24,7 +24,8 @@ import my.bandit.Service.MusicService;
 import my.bandit.ViewModel.NowPlayingViewModel;
 
 public class NowPlaying extends AppCompatActivity {
-    private ImageView currentSongImage, stateImage;
+    private ImageView currentSongImage, stateImage, heartImage, upVoteImage, downVoteImage,
+            nextImage, previousImage;
     private TextView songName, bandName;
     private SeekBar seekBar;
     private NowPlayingViewModel mViewModel;
@@ -34,6 +35,7 @@ public class NowPlaying extends AppCompatActivity {
                                        IBinder service) {
             MusicService.LocalBinder binder = (MusicService.LocalBinder) service;
             mViewModel.setMusicService(binder.getService());
+            mViewModel.fetchNewData(binder.getService().getPlayingPost().getValue());
             initObservers();
         }
 
@@ -49,10 +51,33 @@ public class NowPlaying extends AppCompatActivity {
         bandName = findViewById(R.id.bandName);
         seekBar = findViewById(R.id.songProgressBar);
         stateImage = findViewById(R.id.stateImage);
+        heartImage = findViewById(R.id.heartImageView);
+        upVoteImage = findViewById(R.id.upVoteImageView);
+        downVoteImage = findViewById(R.id.downVoteImageView);
+        nextImage = findViewById(R.id.nextImageView);
+        previousImage = findViewById(R.id.previousImageView);
     }
 
     private void initObservers() {
-        mViewModel.getMusicService().getCurrentlyPlayedPost().observe(this, post -> {
+        mViewModel.getLiked().observe(this, aBoolean -> {
+            if (aBoolean)
+                Glide.with(getApplicationContext()).load(R.drawable.android_like_image).into(upVoteImage);
+            else
+                Glide.with(getApplicationContext()).load(R.drawable.ic_thumb_up_black_24dp).into(upVoteImage);
+        });
+        mViewModel.getDisliked().observe(this, aBoolean -> {
+            if (aBoolean)
+                Glide.with(getApplicationContext()).load(R.drawable.android_unlike_image).into(downVoteImage);
+            else
+                Glide.with(getApplicationContext()).load(R.drawable.ic_thumb_down_black_24dp).into(downVoteImage);
+        });
+        mViewModel.getFavourite().observe(this, aBoolean -> {
+            if (aBoolean)
+                Glide.with(getApplicationContext()).load(R.drawable.ic_favorite_red_24dp).into(heartImage);
+            else
+                Glide.with(getApplicationContext()).load(R.drawable.ic_favorite_black_24dp).into(heartImage);
+        });
+        mViewModel.getMusicService().getPlayingPost().observe(this, post -> {
             Glide.with(getApplicationContext())
                     .load(Api.getImageSource(post.getPictureDir()))
                     .into(currentSongImage);
@@ -70,26 +95,34 @@ public class NowPlaying extends AppCompatActivity {
                 Glide.with(getApplicationContext()).load(R.drawable.ic_pause_white_24dp).into(stateImage);
             }
         });
+    }
+
+    private void initListeners() {
+        nextImage.setOnClickListener(v -> mViewModel.getMusicService().playNext());
+        previousImage.setOnClickListener(v -> mViewModel.getMusicService().playPrevious());
+        heartImage.setOnClickListener(v -> mViewModel.favourite());
+        upVoteImage.setOnClickListener(v -> mViewModel.like());
+        downVoteImage.setOnClickListener(v -> mViewModel.dislike());
         stateImage.setOnClickListener(v -> {
             boolean currentValue = !mViewModel.getMusicService().getIsPlaying().getValue();
             mViewModel.getMusicService().getIsPlaying().setValue(currentValue);
             if (currentValue)
-                mViewModel.continueTimer();
+                mViewModel.getMusicService().continueTimer();
             else
-                mViewModel.pauseTimer();
+                mViewModel.getMusicService().pauseTimer();
         });
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (fromUser) {
-                    mViewModel.moveBar(progress);
-                    mViewModel.continueTimer();
+                    mViewModel.getMusicService().moveBar(progress);
+                    mViewModel.getMusicService().continueTimer();
                 }
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-                mViewModel.pauseTimer();
+                mViewModel.getMusicService().pauseTimer();
             }
 
             @Override
@@ -110,6 +143,7 @@ public class NowPlaying extends AppCompatActivity {
         getApplicationContext().bindService(intent, connection, Context.BIND_AUTO_CREATE);
         mViewModel = new ViewModelProvider(this).get(NowPlayingViewModel.class);
         initViews();
+        initListeners();
     }
 
     public void setAnimation() {
