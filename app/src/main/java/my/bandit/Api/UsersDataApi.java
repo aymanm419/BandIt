@@ -8,14 +8,18 @@ import retrofit2.http.POST;
 import retrofit2.http.Query;
 
 public interface UsersDataApi {
+
+
+    @POST("/user/create")
     @GET("/user/find")
     Call<JsonObject> isUserExists(@Query("username") String userName);
 
-    @POST("/user/create")
-    Call<JsonObject> createAccount(@Query("username") String userName, @Query("password") String password);
+    Call<JsonObject> createAccount(@Query("username") String userName,
+            @Query("password") String password);
 
     @GET("/user/login")
-    Call<JsonObject> validateUserCredentials(@Query("username") String userName, @Query("password") String password);
+    Call<JsonObject> validateUserCredentials(@Query("username") String userName,
+            @Query("password") String password);
 
     @GET("/user/info/id")
     Call<JsonObject> getUserID(@Query("username") String userName);

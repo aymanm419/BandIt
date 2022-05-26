@@ -9,15 +9,15 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class Api {
     private static Api api;
+    private static final String apiSource = "http://127.0.0.1:6969/";
     @Getter
-    private FilesApi filesApi;
+    private final FilesApi filesApi;
     @Getter
-    private UsersDataApi usersDataApi;
+    private final UsersDataApi usersDataApi;
     @Getter
-    private UsersActionApi usersActionApi;
+    private final UsersActionApi usersActionApi;
     @Getter
-    private Gson gson;
-    private static final String apiSource = "http://10.0.2.2:6969/";
+    private final Gson gson;
     private Api() {
         gson = new GsonBuilder()
                 .setLenient()

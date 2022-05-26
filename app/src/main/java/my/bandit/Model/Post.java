@@ -7,10 +7,11 @@ import lombok.Setter;
 
 public class Post {
     @Getter
-    private Song song;
+    private final Song song;
     @Getter
-    private String pictureDir;
-    @Getter @Setter
+    private final String pictureDir;
+    @Getter
+    @Setter
     private int postID;
     public Post(Song song, String pictureDir) {
         this.song = song;
@@ -22,8 +23,6 @@ public class Post {
         if (obj == null)
             return false;
         if (!obj.getClass().equals(this.getClass()))
-            return false;
-        if (!(obj instanceof Post))
             return false;
         return this.getPostID() == ((Post) obj).getPostID();
     }
